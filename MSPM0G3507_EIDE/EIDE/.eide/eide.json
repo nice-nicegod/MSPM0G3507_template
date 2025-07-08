@@ -202,6 +202,13 @@
           "version": 3,
           "beforeBuildTasks": [
             {
+              "name": "check working directory",
+              "command": "cmd /c \"echo Working directory: %CD%\"",
+              "disable": false,
+              "abortAfterFailed": false,
+              "stopBuildAfterFailed": false
+            },
+            {
               "name": "linking syscfg",
               "command": "\"S:\\Source_files\\Keil5\\MSPM0G3507\\MSPM0G3507_template\\MSPM0G3507_EIDE\\EIDE\\syscfg.bat\" \"${projectRoot}\" empty.syscfg",
               "disable": false,
@@ -227,13 +234,12 @@
             "$use": "asm-auto"
           },
           "linker": {
-          "output-format": "elf",
-  "misc-controls": "S:/Source_files/Keil5/MSPM0G3507/MSPM0G3507_template/MSPM0G3507_EIDE/source/ti/driverlib/lib/keil/m0p/mspm0g1x0x_g3x0x/driverlib.a",
-  "xo-base": "",
-  "ro-base": "",
-  "rw-base": ""
-}
-
+            "output-format": "elf",
+            "misc-controls": "S:/Source_files/Keil5/MSPM0G3507/MSPM0G3507_template/MSPM0G3507_EIDE/source/ti/driverlib/lib/keil/m0p/mspm0g1x0x_g3x0x/driverlib.a",
+            "xo-base": "",
+            "ro-base": "",
+            "rw-base": ""
+          }
         }
       }
     }

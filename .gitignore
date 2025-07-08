@@ -18,5 +18,4 @@
 keilkill.bat
 
 # 忽略特定目录及其所有内容
-.vscode/
 Objects/
