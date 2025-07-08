@@ -1,7 +1,7 @@
 {
     "name": "mspm0_sdk",
     "displayName": "MSPM0 SDK",
-    "version": "2.02.00.05",
+    "version": "2.04.00.06",
     "documentationPath": "../docs",
     "includePaths": [
         "../source",

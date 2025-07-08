@@ -259,7 +259,7 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
         }
         voltageSample = metrology_dcFilter(&(phase->params.V_dc_estimate), voltageSample);
 
-    #ifdef ROGOSWKI_SUPPORT
+    #ifdef ROGOWSKI_SUPPORT
         /*
          * With rogowski coils, current samples will pass through 2 filters, to compensate the
          * delay between voltage and current samples, voltage samples are also passed through
@@ -269,7 +269,7 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
     #endif
 
     #ifdef VRMS_SUPPORT
-        voltageSq = ((int64_t)voltageSample) * voltageSample;
+        voltageSq = int64mpy(voltageSample, voltageSample);
         phaseDP->voltageSq += voltageSq;
         ++phaseDP->sampleCount;
         #ifdef SAG_SWELL_SUPPORT
@@ -282,9 +282,8 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
 
         if(operatingMode == OPERATING_MODE_NORMAL)
         {
-            voltageCorrected = _IQ23mpyIQX(phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.phaseCorrection.step - 1) & V_HISTORY_MASK], 23,
-                                (phase->params.current.phaseCorrection.firBeta), 15)
-                               + (phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.phaseCorrection.step) & V_HISTORY_MASK]);
+            voltageCorrected = (int32_t)(int64mpy(phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.phaseCorrection.step - 1) & V_HISTORY_MASK], phase->params.current.phaseCorrection.firBeta) >> 15)
+                                + phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.phaseCorrection.step) & V_HISTORY_MASK];
 
         #ifdef FUNDAMENTAL_VRMS_SUPPORT
             /* The dot product of the raw and the pure voltage signals allows us to precisely estimate
@@ -294,7 +293,7 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
                The answer from this estimator will only be correct once the pure waveform is properly phase
                locked. */
             voltagePure = Metrology_ddsSinLookup(phase->params.purePhase);
-            phaseDP->fVoltageSq += ((int64_t)voltageCorrected) * voltagePure;
+            phaseDP->fVoltageSq += int64mpy(voltageCorrected, voltagePure);
             /* If we look for maximum correlation when the real and synthetic waveforms are in sync:
                     - the sensitivity to errors is not that big around the match
                     - we don't know what the peak should be
@@ -305,7 +304,7 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
                frequency measurement, and we only need to adjust the phase here. This is a sort of PLL, with the
                frequency and phase aspects of the lock being seperately evaluated. */
             voltageQuardPure = Metrology_ddsSinLookup(phase->params.purePhase + 0x40000000);
-            cross_corr = (((int64_t)voltageCorrected) * voltageQuardPure);
+            cross_corr = int64mpy(voltageCorrected, voltageQuardPure);
             cross_corr >>=16;
             /* We need to filter hard at this point, to massively suppress the harmonics. We do this with a single
                pole with a very low turnover point. Obviously, this only tails off at 6dB/octave, so the downside
@@ -327,7 +326,7 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
         _iq23 inputCurrent;
         _iq23 integratorOutput;
 
-        #ifdef ROGOSWKI_SUPPORT
+        #ifdef ROGOWSKI_SUPPORT
             inputCurrent = metrology_dcFilter(&(phase->params.current.I_dc_estimate), workingData->rawCurrentData[ph]);
             _iq23 intnewcurrent = (inputCurrent + workingData->lastRawCurrentData[ph])/2;
             workingData->lastRawCurrentData[ph] = inputCurrent;
@@ -348,31 +347,26 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
         phase->params.current.IHistory[1] = currentData;
 
         #ifdef IRMS_SUPPORT
-            currentDP->currentSq += ((int64_t)(currentSample) *(currentSample));
+            currentDP->currentSq += int64mpy(currentSample, currentSample);
             ++currentDP->sampleCount;
         #endif
 
         if (operatingMode == OPERATING_MODE_NORMAL)
         {
         #ifdef ACTIVE_POWER_SUPPORT
-            voltageCorrected = _IQ23mpyIQX(phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.phaseCorrection.step - 1) & V_HISTORY_MASK], 23,
-                                (phase->params.current.phaseCorrection.firBeta), 15)
-                               + (phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.phaseCorrection.step) & V_HISTORY_MASK]);
-
-            currentDP->activePower += ((int64_t)currentSample) * voltageCorrected;
+            currentDP->activePower += int64mpy(currentSample, voltageCorrected);
             #ifdef FUNDAMENTAL_ACTIVE_POWER_SUPPORT
-                currentDP->FActivePower += ((int64_t)currentSample) * voltagePure;
+                currentDP->FActivePower += int64mpy(currentSample, voltagePure);
             #endif
         #endif
         #ifdef REACTIVE_POWER_SUPPORT
-            voltageQuadCorrected = _IQ23mpyIQX(phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.quadratureCorrection.step - 1) & V_HISTORY_MASK], 23,
-                                            (phase->params.current.quadratureCorrection.firBeta), 15)
-                                              + (phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.quadratureCorrection.step) & V_HISTORY_MASK]);
+            voltageQuadCorrected = (int32_t)(int64mpy(phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.quadratureCorrection.step - 1) & V_HISTORY_MASK], phase->params.current.quadratureCorrection.firBeta) >> 15)
+                                        + phase->params.vHistory[(phase->params.vHistoryIndex - phase->params.current.quadratureCorrection.step) & V_HISTORY_MASK];
 
-            currentDP->reactivePower += ((int64_t)currentSample) * voltageQuadCorrected;
+            currentDP->reactivePower += int64mpy(currentSample, voltageQuadCorrected);
 
             #ifdef FUNDAMENTAL_REACTIVE_POWER_SUPPORT
-                currentDP->FReactivePower += ((int64_t)currentSample) * -voltageQuardPure;
+                currentDP->FReactivePower += int64mpy(currentSample, -voltageQuardPure);
             #endif
         #endif
         }
@@ -462,7 +456,7 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
                         /* start next cycle count */
                         phase->params.voltagePeriod.cycleSamples = z;
                         phaseDP->cycleNumber++;
-#ifdef ROGOSWKI_SUPPORT
+#ifdef ROGOWSKI_SUPPORT
                         phase->params.voltagePeriod.cyclePeriod = _IQ23div(_IQ23div((int32_t)phase->params.voltagePeriod.period,256),PI2);
                         workingData->currentIntegrationData[ph] = 0;
 #endif
@@ -528,7 +522,7 @@ void Metrology_perSampleProcessing(metrologyData *workingData)
         }
         neutral->params.I_History[0] = neutral->params.I_History[1];
         neutral->params.I_History[1] = neutralData;
-        neutralDP->currentSq += ((int64_t)neutralCurrent) * neutralCurrent;
+        neutralDP->currentSq += int64mpy(neutralCurrent, neutralCurrent);
         if(++neutralDP->sampleCount >= SAMPLE_RATE)
         {
             logNeutralParameters(workingData);

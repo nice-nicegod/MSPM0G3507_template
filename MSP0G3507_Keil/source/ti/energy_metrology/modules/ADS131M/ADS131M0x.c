@@ -376,6 +376,8 @@ void ADS_getChannelData(volatile ADS_Instance *adsHandle)
     adsData->crc = adsHandle->rawdata[(ADS_CMDLENGTH + ADS_CHANNELCOUNT) * ADS_WORDLENGTH] << 8 | adsHandle->rawdata[(ADS_CMDLENGTH + ADS_CHANNELCOUNT) * ADS_WORDLENGTH + 1];
 
     ADS_verifyADSCRC(adsHandle, adsData);
+
+    ADS_checkStatusRegister(adsHandle->errors, adsData->response);
 }
 
 /*!
@@ -636,7 +638,53 @@ void ADS_verifyADSCRC(volatile ADS_Instance *adsHandle, volatile ADS_channelData
     */
 }
 
+/*!
+ * @brief check status registers for faults
+ * @param[in] error   The ADS errors
+ * @param[in] data    status register data
+ */
+void ADS_checkStatusRegister(volatile ADS_Errors error, uint16_t data)
+{
+    if((data == 0xFF32) || (data == 0xFF33) || (data == 0xFF34) || (data == 0xFF36) || (data == 0xFF38))
+    {
+        error.rstAckCount++;
+    }
+    else if(data == 0x0011)
+    {
+        error.rstnAckCount++;
+    }
+    else if(data & STATUS_RESET_MASK)
+    {
+        error.resetCount++;
+    }
+    else
+    {
+        if(data & STATUS_F_RESYNC_MASK)
+        {
+            error.fResyncCount++;
+        }
+        if(data & STATUS_REG_MAP_MASK)
+        {
+            error.regMapCount++;
+        }
+        if(data & STATUS_CRC_ERR_MASK)
+        {
+            error.crcErrorCount++;
+        }
+        error.totalComparisions++;
+    }
 
+    if(error.totalComparisions == 0xFFFFFFFF)
+    {
+        error.totalComparisions = 0;
+        error.crcErrorCount     = 0;
+        error.fResyncCount      = 0;
+        error.regMapCount       = 0;
+        error.resetCount        = 0;
+        error.rstAckCount       = 0;
+        error.rstnAckCount      = 0;
+    }
+}
 
 
 

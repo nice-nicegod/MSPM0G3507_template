@@ -373,6 +373,8 @@ void AMC_getChannelData(volatile AMC_Instance *amcHandle)
     amcData->crc = amcHandle->rawdata[(AMC_CMDLENGTH + AMC_CHANNELCOUNT) * AMC_WORDLENGTH] << 8 | amcHandle->rawdata[(AMC_CMDLENGTH + AMC_CHANNELCOUNT) * AMC_WORDLENGTH + 1];
 
     AMC_verifyAMCCRC(amcHandle, amcData);
+
+    AMC_checkStatusRegister(amcHandle->errors, amcData->response);
 }
 
 /*!
@@ -615,10 +617,12 @@ void AMC_verifyAMCCRC(volatile AMC_Instance *amcHandle, volatile AMC_channelData
     if(amcData->crc == CRCResult)
     {
         amcHandle->crcPassCount++;
+        amcHandle->crcFailFlag = FALSE;
     }
     else
     {
         amcHandle->crcFailCount++;
+        amcHandle->crcFailFlag = TRUE;
     }
 
     /* SW CRC ckeck */
@@ -628,10 +632,87 @@ void AMC_verifyAMCCRC(volatile AMC_Instance *amcHandle, volatile AMC_channelData
     if (!crcWord)
     {
         amcHandle->crcFailCount++;
+        amcHandle->crcFailFlag = FALSE;
     }
     else
     {
         amcHandle->crcPassCount++;
+        amcHandle->crcFailFlag = TRUE;
     }
     */
+}
+
+/*!
+ * @brief check status registers for faults
+ * @param[in] error   The AMC errors
+ * @param[in] data    status register data
+ */
+void AMC_checkStatusRegister(volatile AMC_Errors error, uint16_t data)
+{
+    uint32_t secFailStrikeCount;
+    uint32_t maxSecFailCount;
+
+    if((data == 0xFF33) || (data == 0xFF23))
+    {
+        error.rstAckCount++;
+    }
+    else if(data == 0x0011)
+    {
+        error.rstnAckCount++;
+    }
+    else if(data & STATUS_RESET_MASK)
+    {
+        error.resetCount++;
+    }
+    else
+    {
+        if(data & STATUS_F_RESYNC_MASK)
+        {
+            error.fResyncCount++;
+        }
+        if(data & STATUS_REG_MAP_MASK)
+        {
+            error.regMapCount++;
+        }
+        if(data & STATUS_CRC_ERR_MASK)
+        {
+            error.crcErrorCount++;
+        }
+        if(data & STATUS_FUSE_FAIL_MASK)
+        {
+            error.fuseFailCount++;
+        }
+        if(data & STATUS_SEC_FAIL_MASK)
+        {
+            error.secFailCount++;
+            secFailStrikeCount++;
+        }
+        else
+        {
+            secFailStrikeCount = 0;
+        }
+
+        error.totalComparisions++;
+
+        if((secFailStrikeCount != 0) && (secFailStrikeCount > maxSecFailCount))
+        {
+            maxSecFailCount = secFailStrikeCount;
+            error.secFailStrike = maxSecFailCount;
+        }
+    }
+
+    if(error.totalComparisions == 0xFFFFFFFF)
+    {
+        error.totalComparisions = 0;
+        error.crcErrorCount     = 0;
+        error.fResyncCount      = 0;
+        error.fuseFailCount     = 0;
+        error.regMapCount       = 0;
+        error.resetCount        = 0;
+        error.rstAckCount       = 0;
+        error.rstnAckCount      = 0;
+        error.secFailCount      = 0;
+        error.secFailStrike     = 0;
+        maxSecFailCount         = 0;
+    }
 }

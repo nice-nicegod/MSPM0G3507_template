@@ -117,5 +117,14 @@ void user_config_faults(SENSORED_FOC_APPLICATION_T *pMC_App);
  * @return Size of MC app
  */
 uint16_t piRAMInput(float piGain);
-
+/**
+ * @brief updateCloseLoopConfigParam
+ * @param[in] *pMC_App Input Pointer
+ */
+void updateCloseLoopConfigParam(SENSORED_FOC_APPLICATION_T *pMC_App);
+/**
+ * @brief updateCurrentControlConfigParam
+ * @param[in] *pMC_App Input Pointer
+ */
+void updateCurrentControlConfigParam(SENSORED_FOC_APPLICATION_T *pMC_App);
 #endif /* ALGOLIB_APPINTERFACE_ALGORITHM_INCLUDE_APPCONFIGPARAMUPDATE_H_ */

@@ -57,6 +57,7 @@ extern "C" {
 #endif
 
 #ifndef AMC_CHANNELCOUNT
+/*! @brief AMC channel count */
 #define AMC_CHANNELCOUNT            (8)
 #endif
 
@@ -156,6 +157,31 @@ typedef enum
     AMC_CRC_ENABLE
 }AMC_CRC;
 
+/*! @brief Structure to store the amc error counts  */
+typedef struct
+{
+    /*! @brief Reset Acknowledge count  */
+    uint32_t rstAckCount;
+    /*! @brief Reset No Acknowledge count   */
+    uint32_t rstnAckCount;
+    /*! @brief Reset count  */
+    uint32_t resetCount;
+    /*! @brief Resynchronization count  */
+    uint32_t fResyncCount;
+    /*! @brief Register map CRC fault count  */
+    uint32_t regMapCount;
+    /*! @brief SPI Input CRC fault count  */
+    uint32_t crcErrorCount;
+    /*! @brief Fuse Parity fault count  */
+    uint32_t fuseFailCount;
+    /*! @brief High side supply fault count  */
+    uint32_t secFailCount;
+    /*! @brief Total samples count  */
+    uint32_t totalComparisions;
+    /*! @brief sec fail strike count  */
+    uint32_t secFailStrike;
+}AMC_Errors;
+
 /*! @brief AMC_Instance     */
 typedef struct
 {
@@ -191,6 +217,10 @@ typedef struct
     uint32_t            crcPassCount;
     /*! @brief Store crc pass count */
     uint32_t            crcFailCount;
+    /*! @brief Store crc fail flag */
+    bool                crcFailFlag;
+    /*! @brief AMC error counts */
+    AMC_Errors          errors;
 }AMC_Instance;
 
 /*! @enum AMC_OPCODES;*/
@@ -325,35 +355,19 @@ typedef enum
     /*! @brief Defines status register word length 32 bit   */
     #define STATUS_WLENGTH_32BIT_MSB_SIGN_EXT ((uint16_t) 0x0003 << 8)
 
-    /*! @brief Defines status register DRDY7 mask   */
-    #define STATUS_DRDY7_MASK                 ((uint16_t) 0x0080)
-    /*! @brief Defines status register DRDY7 no new data   */
-    #define STATUS_DRDY7_NO_NEW_DATA          ((uint16_t) 0x0000 << 7)
-    /*! @brief Defines status register DRDY7 new data   */
-    #define STATUS_DRDY7_NEW_DATA             ((uint16_t) 0x0001 << 7)
+    /*! @brief Defines status register Fuse parity mask   */
+    #define STATUS_FUSE_FAIL_MASK             ((uint16_t) 0x0080)
+    /*! @brief Defines status register Fuse parity OK   */
+    #define STATUS_FUSE_FAIL_OK               ((uint16_t) 0x0000 << 7)
+    /*! @brief Defines status register Fuse parity not OK  */
+    #define STATUS_FUSE_FAIL_NOT_OK           ((uint16_t) 0x0001 << 7)
 
     /*! @brief Defines status register DRDY6 mask   */
-    #define STATUS_DRDY6_MASK                 ((uint16_t) 0x0040)
-    /*! @brief Defines status register DRDY6 no new data   */
-    #define STATUS_DRDY6_NO_NEW_DATA          ((uint16_t) 0x0000 << 6)
-    /*! @brief Defines status register DRDY6 new data   */
-    #define STATUS_DRDY6_NEW_DATA             ((uint16_t) 0x0001 << 6)
-
-    /*! @brief Defines status register DRDY5 mask   */
-    #define STATUS_DRDY5_MASK                 ((uint16_t) 0x0020)
-    /*! @brief Defines status register DRDY5 no new data   */
-    #define STATUS_DRDY5_NO_NEW_DATA          ((uint16_t) 0x0000 << 5)
-    /*! @brief Defines status register DRDY5 new data   */
-    #define STATUS_DRDY5_NEW_DATA             ((uint16_t) 0x0001 << 5)
-
-
-    /*! @brief Defines status register DRDY4 mask   */
-    #define STATUS_DRDY4_MASK                 ((uint16_t) 0x0010)
-    /*! @brief Defines status register DRDY4 no new data   */
-    #define STATUS_DRDY4_NO_NEW_DATA          ((uint16_t) 0x0000 << 4)
-    /*! @brief Defines status register DRDY4 new data   */
-    #define STATUS_DRDY4_NEW_DATA             ((uint16_t) 0x0001 << 4)
-
+    #define STATUS_SEC_FAIL_MASK              ((uint16_t) 0x0040)
+    /*! @brief Defines status register High-side supply OK   */
+    #define STATUS_SEC_FAIL_OK                ((uint16_t) 0x0000 << 6)
+    /*! @brief Defines status register High-side supply  not OK   */
+    #define STATUS_SEC_FAIL_NOT_OK            ((uint16_t) 0x0001 << 6)
 
     /*! @brief Defines status register DRDY3 mask   */
     #define STATUS_DRDY3_MASK                 ((uint16_t) 0x0008)
@@ -489,7 +503,7 @@ typedef enum
 
     /*! @brief Defines clock register address  */
     #define CLOCK_ADDRESS                                                   ((uint8_t)  0x03)
-
+    /*! @brief AMC default clock setting */
     #if (AMC_CHANNELCOUNT == 8)
     #define AMC_CLOCK_DEFAULT                                                   ((uint16_t) 0xFF0E)
     #endif
@@ -2105,6 +2119,13 @@ void AMC_initalizeAMCRegisters(volatile AMC_Instance *amcHandle);
  * @param[in] amcData     The AMC channel data
  */
 void AMC_verifyAMCCRC(volatile AMC_Instance *amcHandle, volatile AMC_channelData *amcData);
+
+/*!
+ * @brief check status registers for faults
+ * @param[in] error   The AMC errors
+ * @param[in] data    status register data
+ */
+void AMC_checkStatusRegister(volatile AMC_Errors error, uint16_t data);
 
 #ifdef __cplusplus
 }

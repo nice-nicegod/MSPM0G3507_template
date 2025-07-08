@@ -349,8 +349,9 @@ void DALI_reset(void){
     /* set reset state to true, start reset timer, and set all reset values*/
     gControlVar1.resetState = true;
     gControlVar1.terminate = false;
-    NVIC_EnableIRQ(TIMER_2_INST_INT_IRQN);
-    DL_Timer_startCounter(TIMER_2_INST);
+    gResetCounter = 0;
+    NVIC_EnableIRQ(TIMER_1_INST_INT_IRQN);
+    DL_Timer_startCounter(TIMER_1_INST);
     gControlVar1.actualLevel = ACTUAL_LEVEL_RESET;
     gControlVar1.targetLevel = TARGET_LEVEL_RESET;
     gControlVar1.lastActiveLevel = LAST_ACTIVE_LEVEL_RESET;
@@ -849,12 +850,33 @@ void DALI_dtr0(uint8_t * receivedData){
 void DALI_randomiseAddress(void){
     /* Generate Random Address*/
     gRandCounter++;
+
     if(gControlVar1.initialisationState == ENABLED && gRandCounter == 2){
-        DL_CRC_setSeed32(CRC, gInitCounter);
-        DL_CRC_feedData32(CRC, gInitCounter);
-        gControlVar1.randomAddress = (DL_CRC_getResult32(CRC) && 0x00FFFFFF);
+        #ifdef __MSPM0_HAS_TRNG__
+
+        /* Define GENERATE_RANDOM_ADDR_TRNG to generate random address using TRNG */
+        #ifdef GENERATE_RANDOM_ADDR_TRNG
+
+        while (!DL_TRNG_isCaptureReady(TRNG));
+        DL_TRNG_clearInterruptStatus(
+            TRNG, DL_TRNG_INTERRUPT_CAPTURE_RDY_EVENT);
+
+        gControlVar1.randomAddress = (DL_TRNG_getCapture(TRNG) & 0x00FFFFFF);
+        
+        #else 
+        gControlVar1.randomAddress = 1;
+
+        #endif
+
+        #else
+            DL_CRC_setSeed32(CRC, gInitCounter);
+            DL_CRC_feedData32(CRC, gInitCounter);
+            gControlVar1.randomAddress = (DL_CRC_getResult32(CRC) && 0x00FFFFFF);
+        #endif
+
         gRandCounter = 0;
     }
+    
 }
 
 void DALI_compareAddress(void){
@@ -1017,39 +1039,38 @@ void TIMER_0_INST_IRQHandler(){
 void TIMER_1_INST_IRQHandler(){
     switch(DL_Timer_getPendingInterrupt(TIMER_1_INST)){
     case DL_TIMER_IIDX_ZERO:
-        if(gControlVar1.terminate || gInitCounter == 900000 || gControlVar1.initialisationState != ENABLED){
-            /* End initialization if terminate or 15 minutes have passed or initialization has ended */
+        if(gControlVar1.terminate)
+        {
             gControlVar1.terminate = false;
+
+            /* End initialization & reset process if terminate */
+            gControlVar1.initialisationState =  DISABLED;
+            gControlVar1.resetState = false;
+
             DL_Timer_stopCounter(TIMER_1_INST);
         }
-        else{
+
+        if(gInitCounter == 900000){
+            /* End initialization if 15 minutes have passed */
+            gControlVar1.initialisationState =  DISABLED;
+        }
+        else if(gInitCounter < 900000){
             gInitCounter++;
-
         }
-    default:
-        break;
-    }
-}
 
-void TIMER_2_INST_IRQHandler(){
-    switch(DL_Timer_getPendingInterrupt(TIMER_2_INST)){
-    case DL_TIMER_IIDX_ZERO:
-        if(gControlVar1.terminate){
-            /* End reset process via terminate */
-            gControlVar1.terminate = false;
-            DL_Timer_stopCounter(TIMER_2_INST);
-        }
-        else if(gResetCounter == 150){
+        if(gResetCounter == 150){
             /* End reset after 300 ms expries*/
             gControlVar1.resetState = false;
-            DL_Timer_stopCounter(TIMER_2_INST);
         }
-        else{
+        else if(gResetCounter < 150) {
             gResetCounter++;
+        }
 
+        if(gResetCounter == 150 && gInitCounter == 900000)
+        {
+            DL_Timer_stopCounter(TIMER_1_INST);
         }
     default:
         break;
     }
-
 }

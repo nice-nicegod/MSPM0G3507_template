@@ -513,8 +513,10 @@ typedef struct
     updateConfigs:         1,
     /*! Enable Hall Calibration */
     hallCalibEnable:       1,
-    /*! Reserved */
-    reserved1:             2;
+    /*! Update System Parameters */
+    updateSysParams:       1,
+    /*! Reserved 2*/
+    Reserved2:             1;
 }ramAlgoDebugCtrl2;
 
 /*! @brief ALGO_DEBUG_2 register */

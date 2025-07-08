@@ -35,6 +35,7 @@
 /*!
  * @brief Initialize ADS131M03 Registers
  * @param[in] adsHandle     The ADS Instance
+ * @return status
  */
 bool ADS131M03_init(volatile ADS_Instance *adsHandle)
 {

@@ -319,6 +319,9 @@ void update_MiscAlgoConfig(USER_INPUTS_T *pUserInputs)
     /* Closeloop Parameters */
     pUserInputs->closeLoopSlowAccelSpeedSlewRateDeciHzPerSec =
             tbl_clSlowAcc_deci[pUserInputRegs->miscAlgo.b.clSlowAcc];
+
+    pUserInputs->ipdMaxOverflow =  
+                    tbl_ipdMaxOverflow[pUserInputRegs->miscAlgo.b.ipdMaxOverflow];
 }
 
 void appUserInputsInit(USER_INPUTS_T *pUserInputs)

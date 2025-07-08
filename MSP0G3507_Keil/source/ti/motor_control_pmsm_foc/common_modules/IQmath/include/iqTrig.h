@@ -114,6 +114,16 @@ extern "C" {
 #define INV_DELX_LOOKUP              (int32_t)(((LOOKUP_POINTS - 1) / 0.25))
 
 /**
+ * @brief LUT based sine computation
+ */
+int32_t sine_LowPriority(int32_t orig_angle);
+
+/**
+ * @brief LUT based cosine computation
+ */
+int32_t cosine_LowPriority(int32_t orig_angle);
+
+/**
  * @brief Configures the MATHACL for sinCos computation and set the angle
  */
 void sinCosMATHACLCompute(int_fast32_t orig_angle);

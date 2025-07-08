@@ -610,6 +610,32 @@ static const int32_t sineTable[METROLOGY_DDS_STEPS + 1] =
  */
 int32_t Metrology_ddsSinLookup(uint32_t phase);
 
+/*!
+ * @brief 64 bit multiplication
+ * @param[in] Input1 first input
+ * @param[in] Input2 second input
+ * @return multiplication result
+ */
+__STATIC_INLINE int64_t int64mpy(int32_t Input1, int32_t Input2)
+{
+    int32_t uLow,vLow;
+    int32_t uHigh,vHigh;
+    int64_t result;
+
+    /* Implement MULHS, high side of 64-bit 32bitx32bit multiplication */
+    uLow = Input1 & 0xFFFF;
+    vLow = Input2 & 0xFFFF;
+
+    uHigh = Input1 >> 16;
+    vHigh = Input2 >> 16;
+
+    result = (uLow*vLow);
+    result += (int64_t)(uHigh*vLow + uLow*vHigh) <<16 ;
+    result += (int64_t)(uHigh*vHigh) << 32;
+
+    return (int64_t)result;
+}
+
 #ifdef __cplusplus
 }
 #endif

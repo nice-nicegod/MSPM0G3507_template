@@ -272,10 +272,4 @@ void FOC_faultReport(SENSORED_FOC_APPLICATION_T *pMC_App, FAULT_SERVICE_T *pFaul
  */
 void FOC_fault_Recovery(SENSORED_FOC_APPLICATION_T *pMC_App, FAULT_SERVICE_T *pFault);
 
-/**
- * @brief Return size of MC app
- * @return Size of MC app
- */
-uint32_t getMCAppSize(void);
-
 #endif /* APPLICATION_H_ */

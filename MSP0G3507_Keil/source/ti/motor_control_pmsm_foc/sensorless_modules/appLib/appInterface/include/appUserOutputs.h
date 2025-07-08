@@ -177,6 +177,50 @@ typedef struct
     int32_t q;
 
 }OUTPUT_DQ_T;
+
+
+/*! @brief IPD identified sector types */
+typedef enum
+{
+    /*! IPD sector Ac */
+    Ac = 0,
+    /*! IPD sector aC */
+    aC = 1,
+    /*! IPD sector Bc */
+    Bc = 2,
+    /*! IPD sector bC */
+    bC = 3,
+    /*! IPD sector aB */
+    aB = 4,
+    /*! IPD sector Ab */
+    Ab = 5,
+    /*! Max number of IPD sector */
+    IPD_IDENTIFIED_SECTOR_MAX =  0xFFFFFFFF
+}IPD_IDENTIFIED_SECTOR_T;
+
+/*! @brief appVersion structure */
+typedef struct
+{
+    uint32_t
+    /*! Patch version */
+    patchVersion:       8,
+    /*! Minor version */
+    minorVersion:       8,
+    /*! Major version */
+    majorVersion:       8,
+    /*! Reserved */
+    reserved:           8;
+}appVersion;
+
+/*! @brief appVersion register */
+typedef union
+{
+    /*! Bit wise access */
+    appVersion b;
+    /*! Block access */
+    uint32_t w;
+}APP_VERSION_T;
+
 /*! @brief User output structure */
 typedef struct
 {
@@ -197,6 +241,8 @@ typedef struct
     OUTPUTS_PI_T piId;
     /*! PI IQ */
     OUTPUTS_PI_T piIq;
+    /*! IPD identified sector */
+    IPD_IDENTIFIED_SECTOR_T ipdIdentifiedSector;
     /*! Estimated speed */
     int32_t estimatedSpeed;
     /*! DC bus voltage */
@@ -207,6 +253,8 @@ typedef struct
     uint32_t gateDriverFaultStatus;
     /*! @brief controller fault status register for external reporting */
     uint32_t controllerFaultStatus;
+    /*! Application FW version */
+    APP_VERSION_T appVersion;
 }USER_STATUS_INTERFACE_T;
 
 /* Extern parameter */

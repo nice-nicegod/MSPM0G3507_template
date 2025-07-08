@@ -35,6 +35,7 @@
 /*!
  * @brief Initialize AMC131M03 Registers
  * @param[in] amcHandle     The AMC Instance
+ * @return status
  */
 bool AMC131M03_init(volatile AMC_Instance *amcHandle)
 {

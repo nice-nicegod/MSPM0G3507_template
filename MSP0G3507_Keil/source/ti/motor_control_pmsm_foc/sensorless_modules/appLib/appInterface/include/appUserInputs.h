@@ -283,6 +283,10 @@ typedef struct
         closeLoopFastAccelSpeedSlewRateDeciHzPerSec,
         /*! Close Loop Decel slew rate */
         closeLoopFastDecelSpeedSlewRateDeciHzPerSec;
+        
+    uint8_t
+        /*! Maximum number of timer overflows allowed during IPD */
+        ipdMaxOverflow;
 }USER_INPUTS_T;
 
 #ifdef __cplusplus

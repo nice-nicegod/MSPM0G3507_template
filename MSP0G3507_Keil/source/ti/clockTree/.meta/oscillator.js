@@ -1,7 +1,5 @@
 let Common = system.getScript("/ti/driverlib/Common.js");
 const { getDefaultValue } = system.getScript("./defaultValue.js");
-const { device2Family, isDeviceFamily_PARENT_MSPM0L122X_L222X } = system.getScript("../../driverlib/Common.js");
-const family = device2Family(system.deviceData);
 
 function validateM0GSYSOSC(inst, validation)
 {
@@ -91,7 +89,7 @@ function validateM0GSYSOSC(inst, validation)
 
 function validateM0LSYSOSC(inst, validation) {
 
-    if(Common.isDeviceFamily_PARENT_MSPM0L122X_L222X()) {
+    if((Common.isDeviceFamily_PARENT_MSPM0L122X_L222X())) {
         let sysctl = system.modules["/ti/driverlib/SYSCTL"];
         if(sysctl && sysctl.$static.clockTreeEn) {
             let mod = system.modules["/ti/clockTree/mux.js"];
@@ -100,7 +98,8 @@ function validateM0LSYSOSC(inst, validation) {
                 validation.logWarning("Note: VBAT needs to be powered for LFCLK operation.", lfxtMux, "inputSelect");
             }
         }
-
+    }
+    if((Common.isDeviceFamily_PARENT_MSPM0L122X_L222X() || Common.isDeviceFamily_PARENT_MSPM0L111X())) {
         /* Special Case Validation for ROSC */
         if(inst.enableROSC){
             validation.logInfo("PA2 is being configured for ROSC and should not be used for other pin selections.", inst, "enableROSC");
@@ -169,19 +168,14 @@ function validate(inst, validation)
 {
     if(inst.$name == "SYSOSC")
     {
-        switch(family){
-            case "MSPM0G":
-                validateM0GSYSOSC(inst, validation);
-                break;
-            case "MSPM0L":
-                validateM0LSYSOSC(inst, validation);
-                break;
-            case "MSPM0C":
-                validateM0CSYSOSC(inst, validation);
-                break;
-            default:
-                throw "family not recognized";
-                break;
+        if(Common.isDeviceM0G()){
+            validateM0GSYSOSC(inst, validation);
+        }
+        else if(Common.isDeviceM0L() || Common.isDeviceM0H() || Common.isDeviceFamily_PARENT_MSPM0C1105_C1106()){
+            validateM0LSYSOSC(inst, validation);
+        }
+        else if(Common.isDeviceFamily_PARENT_MSPM0C110X()){
+            validateM0CSYSOSC(inst, validation);
         }
     }
 }
@@ -191,7 +185,7 @@ function pinmuxRequirements(inst)
     let resources = [];
     // CLOCKTREE ROSC
     if(!inst.disableSYSOSC && inst.enableROSC){
-        if(!Common.isDeviceFamily_PARENT_MSPM0L122X_L222X()){
+        if(!(Common.isDeviceFamily_PARENT_MSPM0L122X_L222X() || Common.isDeviceFamily_PARENT_MSPM0L111X())){
             resources.push({
                 name            : "roscPin",
                 displayName     : "ROSC",
@@ -284,7 +278,7 @@ function extendConfig({ $ipInstance })
             // {name: 16},
             {name: 4}
         ];
-        if(family === "MSPM0C"){
+        if(Common.isDeviceFamily_PARENT_MSPM0C110X()){
             /* M0C does not have a ROSC and has a max frequency of 24 */
             _.remove(SYSOSC_extraConfig, ["name", "enableROSC"]);
             //_.remove(SYSOSC_extraConfig, ["name", "disableSYSOSC"]);

@@ -112,6 +112,8 @@ extern "C"
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <ti/devices/msp/msp.h>
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 //*****************************************************************************
 //
@@ -242,95 +244,188 @@ extern _iq1 _IQ1mpy_mathacl(_iq1 A, _iq1 B);
  *
  * @return                Global IQ type result of multiplication.
  */
-#if GLOBAL_IQ == 30
-#define _IQmpy_mathacl(A, B)            _IQ30mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 29
-#define _IQmpy_mathacl(A, B)            _IQ29mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 28
-#define _IQmpy_mathacl(A, B)            _IQ28mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 27
-#define _IQmpy_mathacl(A, B)            _IQ27mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 26
-#define _IQmpy_mathacl(A, B)            _IQ26mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 25
-#define _IQmpy_mathacl(A, B)            _IQ25mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 24
-#define _IQmpy_mathacl(A, B)            _IQ24mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 23
-#define _IQmpy_mathacl(A, B)            _IQ23mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 22
-#define _IQmpy_mathacl(A, B)            _IQ22mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 21
-#define _IQmpy_mathacl(A, B)            _IQ21mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 20
-#define _IQmpy_mathacl(A, B)            _IQ20mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 19
-#define _IQmpy_mathacl(A, B)            _IQ19mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 18
-#define _IQmpy_mathacl(A, B)            _IQ18mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 17
-#define _IQmpy_mathacl(A, B)            _IQ17mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 16
-#define _IQmpy_mathacl(A, B)            _IQ16mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 15
-#define _IQmpy_mathacl(A, B)            _IQ15mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 14
-#define _IQmpy_mathacl(A, B)            _IQ14mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 13
-#define _IQmpy_mathacl(A, B)            _IQ13mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 12
-#define _IQmpy_mathacl(A, B)            _IQ12mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 11
-#define _IQmpy_mathacl(A, B)            _IQ11mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 10
-#define _IQmpy_mathacl(A, B)            _IQ10mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 9
-#define _IQmpy_mathacl(A, B)            _IQ9mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 8
-#define _IQmpy_mathacl(A, B)            _IQ8mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 7
-#define _IQmpy_mathacl(A, B)            _IQ7mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 6
-#define _IQmpy_mathacl(A, B)            _IQ6mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 5
-#define _IQmpy_mathacl(A, B)            _IQ5mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 4
-#define _IQmpy_mathacl(A, B)            _IQ4mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 3
-#define _IQmpy_mathacl(A, B)            _IQ3mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 2
-#define _IQmpy_mathacl(A, B)            _IQ2mpy_mathacl(A, B)
-#endif
-#if GLOBAL_IQ == 1
-#define _IQmpy_mathacl(A, B)            _IQ1mpy_mathacl(A, B)
+#ifdef _IQ_MPY_MATHACL_INLINE
+    #if GLOBAL_IQ == 30
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 30)
+    #endif
+    #if GLOBAL_IQ == 29
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 29)
+    #endif
+    #if GLOBAL_IQ == 28
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 28)
+    #endif
+    #if GLOBAL_IQ == 27
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 27)
+    #endif
+    #if GLOBAL_IQ == 26
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 26)
+    #endif
+    #if GLOBAL_IQ == 25
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 25)
+    #endif
+    #if GLOBAL_IQ == 24
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 24)
+    #endif
+    #if GLOBAL_IQ == 23
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 23)
+    #endif
+    #if GLOBAL_IQ == 22
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 22)
+    #endif
+    #if GLOBAL_IQ == 21
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 21)
+    #endif
+    #if GLOBAL_IQ == 20
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 20)
+    #endif
+    #if GLOBAL_IQ == 19
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 19)
+    #endif
+    #if GLOBAL_IQ == 18
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 18)
+    #endif
+    #if GLOBAL_IQ == 17
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 17)
+    #endif
+    #if GLOBAL_IQ == 16
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 16)
+    #endif
+    #if GLOBAL_IQ == 15
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 15)
+    #endif
+    #if GLOBAL_IQ == 14
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 14)
+    #endif
+    #if GLOBAL_IQ == 13
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 13)
+    #endif
+    #if GLOBAL_IQ == 12
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 12)
+    #endif
+    #if GLOBAL_IQ == 11
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 11)
+    #endif
+    #if GLOBAL_IQ == 10
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 10)
+    #endif
+    #if GLOBAL_IQ == 9
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 9)
+    #endif
+    #if GLOBAL_IQ == 8
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 8)
+    #endif
+    #if GLOBAL_IQ == 7
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 7)
+    #endif
+    #if GLOBAL_IQ == 6
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 6)
+    #endif
+    #if GLOBAL_IQ == 5
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 5)
+    #endif
+    #if GLOBAL_IQ == 4
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 4)
+    #endif
+    #if GLOBAL_IQ == 3
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 3)
+    #endif
+    #if GLOBAL_IQ == 2
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 2)
+    #endif
+    #if GLOBAL_IQ == 1
+    #define _IQmpy_mathacl(A, B)            _IQNmpy_mathacl_inline(A, B, 1)
+    #endif
+#else
+    #if GLOBAL_IQ == 30
+    #define _IQmpy_mathacl(A, B)            _IQ30mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 29
+    #define _IQmpy_mathacl(A, B)            _IQ29mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 28
+    #define _IQmpy_mathacl(A, B)            _IQ28mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 27
+    #define _IQmpy_mathacl(A, B)            _IQ27mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 26
+    #define _IQmpy_mathacl(A, B)            _IQ26mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 25
+    #define _IQmpy_mathacl(A, B)            _IQ25mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 24
+    #define _IQmpy_mathacl(A, B)            _IQ24mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 23
+    #define _IQmpy_mathacl(A, B)            _IQ23mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 22
+    #define _IQmpy_mathacl(A, B)            _IQ22mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 21
+    #define _IQmpy_mathacl(A, B)            _IQ21mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 20
+    #define _IQmpy_mathacl(A, B)            _IQ20mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 19
+    #define _IQmpy_mathacl(A, B)            _IQ19mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 18
+    #define _IQmpy_mathacl(A, B)            _IQ18mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 17
+    #define _IQmpy_mathacl(A, B)            _IQ17mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 16
+    #define _IQmpy_mathacl(A, B)            _IQ16mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 15
+    #define _IQmpy_mathacl(A, B)            _IQ15mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 14
+    #define _IQmpy_mathacl(A, B)            _IQ14mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 13
+    #define _IQmpy_mathacl(A, B)            _IQ13mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 12
+    #define _IQmpy_mathacl(A, B)            _IQ12mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 11
+    #define _IQmpy_mathacl(A, B)            _IQ11mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 10
+    #define _IQmpy_mathacl(A, B)            _IQ10mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 9
+    #define _IQmpy_mathacl(A, B)            _IQ9mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 8
+    #define _IQmpy_mathacl(A, B)            _IQ8mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 7
+    #define _IQmpy_mathacl(A, B)            _IQ7mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 6
+    #define _IQmpy_mathacl(A, B)            _IQ6mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 5
+    #define _IQmpy_mathacl(A, B)            _IQ5mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 4
+    #define _IQmpy_mathacl(A, B)            _IQ4mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 3
+    #define _IQmpy_mathacl(A, B)            _IQ3mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 2
+    #define _IQmpy_mathacl(A, B)            _IQ2mpy_mathacl(A, B)
+    #endif
+    #if GLOBAL_IQ == 1
+    #define _IQmpy_mathacl(A, B)            _IQ1mpy_mathacl(A, B)
+    #endif
 #endif
 
 //*****************************************************************************
@@ -605,6 +700,27 @@ extern _iq1 _IQ1sqrt_mathacl(_iq1 A);
 #if GLOBAL_IQ == 1
 #define _IQsqrt_mathacl(A)              _IQ1sqrt_mathacl(A)
 #endif
+
+/**
+ * @brief     MATHACL inline multiplication
+ *
+ * @param iqNInput1       IQN type value numerator to be divided.
+ * @param iqNInput2       IQN type value denominator to divide by.
+ * @param q_value         IQ format.
+ *
+ * @return                IQN type result of the multiplication.
+ */
+__STATIC_INLINE int_fast32_t _IQNmpy_mathacl_inline(int_fast32_t iqNInput1, int_fast32_t iqNInput2, const int8_t q_value)
+{
+    /* write control */
+    MATHACL->CTL = 6 | (q_value<<8) | (1 << 5);
+    /* write operands to HWA */
+    MATHACL->OP2 = iqNInput2;
+    /* write trigger word last */
+    MATHACL->OP1 = iqNInput1;
+    /* read iqmpy product */
+    return MATHACL->RES1;
+}
 
 //*****************************************************************************
 //

@@ -86,7 +86,7 @@ typedef struct
     /*! @brief The power factor, in IQ13 format */
     _iq13 powerFactor;
     /*! @brief The angle between voltage and current in IQ15 format
-               angle = power fcator angle * 180 /2^15  */
+               angle = power factor angle * 180 /2^15  */
     _iq15 powerFactorAngle;
     /*! @brief The under deviation from the mains nominal voltage in percentage (IQ19 format) */
     _iq19 underdeviation;

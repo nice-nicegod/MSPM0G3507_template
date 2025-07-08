@@ -94,6 +94,7 @@
 #include "speedProfile.h"
 #include <string.h>
 #include "ISR.h"
+#include "appConfigParamUpdate.h"
 
 static void focStartTransition(SENSORED_FOC_APPLICATION_T *);
 
@@ -1031,6 +1032,8 @@ static void updateStatusVariables(SENSORED_FOC_APPLICATION_T *pMC_App)
     pUserStatusRegs->dcBusVoltage = pMC_App->motorInputs.voltage.vdcFilt;
 
     pUserStatusRegs->torqueLimit = pMC_App->foc.closeLoop.piSpeed.outMax;
+
+    pUserStatusRegs->appVersion.w = APP_FW_VERSION;
 }
 
 void updateConfigs(void)
@@ -1046,6 +1049,13 @@ void updateConfigs(void)
             pUserCtrlRegs->algoDebugCtrl2.b.updateConfigs = 0;
         }
 
+        /* Update the System Parameters dynamically*/
+        if(pUserCtrlRegs->algoDebugCtrl2.b.updateSysParams)
+        {
+            update_SystemParams(&pMC_App->pAppInterface->userInputs);
+            updateCloseLoopConfigParam(pMC_App);
+            updateCurrentControlConfigParam(pMC_App);
+        }
         updateRAMConfigurationParameters(pMC_App);
 
         pMC_App->pAppInterface->userInputs.debugFlags.b.updatedData = TRUE;

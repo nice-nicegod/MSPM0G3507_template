@@ -57,6 +57,7 @@ extern "C" {
 #endif
 
 #ifndef ADS_CHANNELCOUNT
+/*! @brief ADS channel count */
 #define ADS_CHANNELCOUNT            (8)
 #endif
 
@@ -156,6 +157,25 @@ typedef enum
     ADS_CRC_ENABLE
 }ADS_CRC;
 
+/*! @brief Structure to store the ADS error counts  */
+typedef struct
+{
+    /*! @brief Reset Acknowledge count  */
+    uint32_t rstAckCount;
+    /*! @brief Reset No Acknowledge count   */
+    uint32_t rstnAckCount;
+    /*! @brief Reset count  */
+    uint32_t resetCount;
+    /*! @brief Resynchronization count  */
+    uint32_t fResyncCount;
+    /*! @brief Register map CRC fault count  */
+    uint32_t regMapCount;
+    /*! @brief SPI Input CRC fault count  */
+    uint32_t crcErrorCount;
+    /*! @brief Total samples count  */
+    uint32_t totalComparisions;
+}ADS_Errors;
+
 /*! @brief ADS_Instance     */
 typedef struct
 {
@@ -191,6 +211,8 @@ typedef struct
     uint32_t            crcPassCount;
     /*! @brief Store crc pass count */
     uint32_t            crcFailCount;
+    /*! @brief ADS error counts */
+    ADS_Errors          errors;
 }ADS_Instance;
 
 /*! @enum ADS_OPCODES   */
@@ -2052,6 +2074,13 @@ void ADS_initalizeADSRegisters(volatile ADS_Instance *adsHandle);
  * @param[in] adsData     The ADS channel data
  */
 void ADS_verifyADSCRC(volatile ADS_Instance *adsHandle, volatile ADS_channelData *adsData);
+
+/*!
+ * @brief check status registers for faults
+ * @param[in] error   The ADS errors
+ * @param[in] data    status register data
+ */
+void ADS_checkStatusRegister(volatile ADS_Errors error, uint16_t data);
 
 #ifdef __cplusplus
 }

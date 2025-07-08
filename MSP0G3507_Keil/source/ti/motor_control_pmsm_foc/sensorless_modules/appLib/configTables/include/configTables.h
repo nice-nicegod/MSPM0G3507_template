@@ -121,6 +121,9 @@ extern const uint16_t tbl1_olAccA1A2_centiHzPerSec[8];
 /*! @brief Table 2 for open loop acceleration */
 extern const uint16_t tbl2_olAccA1A2_HzPerSec[8];
 
+/*! @brief Table for PWM Frequency Selection */
+extern const uint16_t tbl1_clPWMFreqKHz[16];
+
 /* Close Loop Speed and Acceleration Slew Rates */
 /*! @brief Table 1 for close loop acceleration and deceleration */
 extern const uint16_t tbl1_clDecClAcc_deciHzPerSec[16];
@@ -192,6 +195,11 @@ extern const _iq tbl_pu[32];
 
 /*! @brief Table for Modulation Limit Beyond which Flux weakening is enabled */
 extern const _iq tbl_mSqrRef[4];
+
+/* Misc algo 1 Params*/
+/*! @brief Table for IPD maximum overflow */
+extern const uint8_t tbl_ipdMaxOverflow[4];
+
 #ifdef __cplusplus
 }
 #endif

@@ -35,6 +35,8 @@
  *  ======== Common.js ========
  */
 
+let peripherals = Object.keys(system.deviceData.peripherals);
+
 const InterruptPriorityOptions = [
     { name: "DEFAULT", displayName: "Default", description: "Default interrupt priority" },
     { name: "0", displayName: "Level 0 - Highest", description: "Priority Level: Highest" },
@@ -97,6 +99,7 @@ exports = {
     parseFloatUnitInput: parseFloatUnitInput,
 
     peripheralCount: peripheralCount,
+    getTimerInstances: getTimerInstances,
     getDeviceName: getDeviceName,
 
     isDeviceM0G                             : isDeviceM0G,
@@ -112,6 +115,9 @@ exports = {
     isDeviceFamily_PARENT_MSPM0L122X        : isDeviceFamily_PARENT_MSPM0L122X,
     isDeviceFamily_PARENT_MSPM0L222X        : isDeviceFamily_PARENT_MSPM0L222X,
     isDeviceFamily_PARENT_MSPM0C110X        : isDeviceFamily_PARENT_MSPM0C110X,
+    isDeviceFamily_PARENT_MSPM0L111X        : isDeviceFamily_PARENT_MSPM0L111X,
+    isDeviceFamily_PARENT_MSPM0H321X        : isDeviceFamily_PARENT_MSPM0H321X,
+    isDeviceFamily_PARENT_MSPM0C1105_C1106  : isDeviceFamily_PARENT_MSPM0C1105_C1106,
     isDeviceFamily_MSPS003FX                : isDeviceFamily_MSPS003FX,
 
     I2CTargetWakeupWorkaroundFixed          : I2CTargetWakeupWorkaroundFixed,
@@ -157,6 +163,8 @@ exports = {
 
     createFormattedArray: createFormattedArray,
 
+    isTimerA2XBUSCLKSupported  : isTimerA2XBUSCLKSupported,
+
     getBUSCLKFreq       : getBUSCLKFreq,
 
     getModuleKeys       : getModuleKeys,
@@ -173,6 +181,10 @@ exports = {
     getTimerPWMInstance     : getTimerPWMInstance,
 
     isTimerFourCCCapable    : isTimerFourCCCapable,
+    getMainTriggerETSELValue : getMainTriggerETSELValue,
+
+    hasExpandedADCVRSEL     : hasExpandedADCVRSEL,
+    hasMATHACL              : hasMATHACL,
 };
 
 /*
@@ -296,14 +308,18 @@ function boardName()
  */
 function device2Family(device)
 {
-    if(isDeviceM0C()){
+    /* Handle N1_48 3V special case */
+    if(isDeviceFamily_PARENT_MSPM0C1105_C1106()) {
+        return "MSPM0C1105_C1106";
+    }
+
+    else if(isDeviceM0C()){
         return "MSPM0C"
     }
+
     /* deviceId is the directory name within the pinmux/deviceData */
     let deviceId = device.deviceId;
-
-    let family = deviceId.match(/MSP(M0G|M0L|M0C)/)[0];
-
+    let family = deviceId.match(/MSP(M0G|M0L|M0C|M0H)/)[0];
     return(family);
 }
 
@@ -1703,6 +1719,37 @@ function peripheralCount(peripheralType)
     return (count);
 }
 
+function getTimerInstances(module="TIMER") {
+    var instancesList = [];
+
+    for (var i in peripherals) {
+        var periph = peripherals[i]
+        switch(module) {
+            case "QEI": // QEI module is available on TIMG8-11
+                if (/TIMG(8|9|10|11)/.test(periph)) {
+                    instancesList.push(periph)
+                }
+                break;
+            case "TIMERFault": // Fault module is available on TIMAx
+                if (/TIMA[0-9]+/.test(periph)) {
+                    instancesList.push(periph)
+                }
+                break;
+            case "PWM":
+            case "CAPTURE":
+            case "COMPARE":
+            case "TIMER":
+            default: // Catch all, finds all Timer instances
+                if (/TIM[A-Z][0-9]+/.test(periph)) {
+                    instancesList.push(periph)
+                }
+                break;
+        }
+    }
+
+    return (instancesList);
+}
+
 function getDeviceName()
 {
 	var deviceName = system.deviceData.device;
@@ -1742,18 +1789,30 @@ function isDeviceFamily_PARENT_MSPM0L222X(){
 }
 /* Checks if device is part of MSPM0C110X device family */
 function isDeviceFamily_PARENT_MSPM0C110X(){
+    /* MSPM0C1105/MSPM0C1106 does not fall under this family */
     var deviceName = system.deviceData.device;
+    if(["MSPM0C1105", "MSPM0C1106"].includes(deviceName)) return false;
     return (["MSPM0C110X","MSPS003FX"].includes(deviceName));
 }
-/* Checks if device is part of MSPM0C110X device family */
+/* Checks if device is part of MSPM0H321X device family */
 function isDeviceFamily_PARENT_MSPM0H321X(){
     var deviceName = system.deviceData.device;
     return (["MSPM0H321X"].includes(deviceName));
+}
+/* Checks if device is part of MSPM0C1105_C1106 family */
+function isDeviceFamily_PARENT_MSPM0C1105_C1106() {
+    var deviceName = system.deviceData.device;
+    return(["MSPM0C1105_C1106", "MSPM0C1105", "MSPM0C1106"].includes(deviceName));
 }
 /* Checks if device is part of MSPS003FX device family */
 function isDeviceFamily_MSPS003FX(){
     var deviceName = system.deviceData.device;
     return (["MSPS003FX"].includes(deviceName));
+}
+/* Checks if device is part of MSPM0L111X device family */
+function isDeviceFamily_PARENT_MSPM0L111X(){
+    var deviceName = system.deviceData.device;
+    return (["MSPM0L111X"].includes(deviceName));
 }
 
 /* checks if current device is one of M0x110x series */
@@ -1776,11 +1835,11 @@ function isDeviceM0G()
 }
 /* checks if current device is one of MSPM0L-series */
 function isDeviceM0L(){
-    return (isDeviceFamily_PARENT_MSPM0L11XX_L13XX() || isDeviceFamily_PARENT_MSPM0L122X_L222X());
+    return (isDeviceFamily_PARENT_MSPM0L11XX_L13XX() || isDeviceFamily_PARENT_MSPM0L122X_L222X() || isDeviceFamily_PARENT_MSPM0L111X());
 }
 /* checks if current device is one of MSPM0C-series */
 function isDeviceM0C(){
-    return (isDeviceFamily_PARENT_MSPM0C110X());
+    return (isDeviceFamily_PARENT_MSPM0C110X() || isDeviceFamily_PARENT_MSPM0C1105_C1106());
 }
 /* checks if current device is one of MSPM0H-series */
 function isDeviceM0H(){
@@ -1801,8 +1860,17 @@ function getDeviceFamily(){
     else if(isDeviceFamily_PARENT_MSPM0C110X()){
         return "MSPM0C110X";
     }
-    if(isDeviceFamily_PARENT_MSPM0GX51X()){
+    else if(isDeviceFamily_PARENT_MSPM0GX51X()){
         return "MSPM0GX51X";
+    }
+    else if(isDeviceFamily_PARENT_MSPM0L111X()){
+        return "MSPM0L111X";
+    }
+    else if(isDeviceFamily_PARENT_MSPM0H321X()){
+        return "MSPM0H321X";
+    }
+    else if(isDeviceFamily_PARENT_MSPM0C1105_C1106()) {
+        return "MSPM0C1105_C1106";
     }
     return undefined;
 }
@@ -1823,7 +1891,7 @@ function I2CTargetWakeupWorkaroundFixed() {
 // TODO: confirm with documentation
 /* Check if device supports BSL configuration */
 function hasBSLConfig(){
-    return (isDeviceM0G() || isDeviceM0L());
+    return (isDeviceM0G() || isDeviceM0L() || isDeviceFamily_PARENT_MSPM0C1105_C1106() || isDeviceFamily_PARENT_MSPM0H321X());
 }
 
 /* Check if device supports Data Region configuration */
@@ -1834,7 +1902,7 @@ function hasDataRegionConfig(){
 
 /* Check if device supports Timer A configuration */
 function hasTimerA(){
-    return (isDeviceM0G() || isDeviceM0C() || isDeviceFamily_PARENT_MSPM0L122X_L222X());
+    return /TIMA/.test(peripherals);
 }
 
 function isInternalTimerChannel(cc){
@@ -2469,6 +2537,17 @@ function createFormattedArray(values, numElemPerLine, nestingLevel)
 }
 
 /*
+ *  ======== isTimerA2XBUSCLKSupported ========
+ *  Returns if 2X BUSCLK supported for timer modes using TIMA based on device family
+ *
+ * @return if 2x BUSCLK is supported on device
+ */
+function isTimerA2XBUSCLKSupported()
+{
+    return isDeviceFamily_PARENT_MSPM0H321X() || isDeviceFamily_PARENT_MSPM0C1105_C1106();
+}
+
+/*
  *  ======== getBUSCLKFreq ========
  *  Get the BUSCLK frequency based on peripheral power domain
  *
@@ -2690,9 +2769,9 @@ function getTimerPWMInstance(timerPeripheral){
 /*
  *  ======== hasTrimTable ========
  *  Checks if selected device requires Trim Table workaround for linker generation
- *  
+ *
  *  @return boolean answer
- * 
+ *
  */
 function hasTrimTable(){
     if(isDeviceFamily_PARENT_MSPM0GX51X()){
@@ -2717,4 +2796,193 @@ function isTimerFourCCCapable(inst)
     }catch (e) {
         return false;
     }
+}
+
+/*
+ *  ======== isTimerFourCCCapable ========
+ *  For a given timer peripheral, returns the ETSEL value that needs to be
+ *  set for that timer to trigger itself as the main cross triger configuration.
+ *
+ *  @param Timer module instance
+ *
+ *  @return ETSEL value
+ *
+ */
+function getMainTriggerETSELValue(inst) {
+    let main_timer;
+    try {
+        main_timer = inst.peripheral.$solution.peripheralName;
+    }
+    catch(e) {
+        return 0;
+    }
+    if(isDeviceFamily_PARENT_MSPM0G1X0X_G3X0X()) {
+        switch (true) {
+            case (main_timer == "TIMA0" || main_timer == "TIMG0"):
+                return 0;
+                break;
+            case (main_timer == "TIMA1" || main_timer == "TIMG8"):
+                return 1;
+                break;
+            case main_timer == "TIMG6":
+                return 2;
+                break;
+            case main_timer == "TIMG7":
+                return 3;
+                break;
+            case main_timer == "TIMG12":
+                return 4;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+    else if(isDeviceFamily_PARENT_MSPM0L11XX_L13XX()) {
+        switch (true) {
+            case main_timer == "TIMG0":
+                return 0;
+                break;
+            case main_timer == "TIMG1":
+                return 1;
+                break;
+            case main_timer == "TIMG2":
+                return 2;
+                break;
+            case main_timer == "TIMG4":
+                return 3;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+    else if(isDeviceFamily_PARENT_MSPM0L122X_L222X()) {
+        switch (true) {
+            case main_timer == "TIMA0":
+                return 0;
+                break;
+            case main_timer == "TIMG0":
+                return 1;
+                break;
+            case main_timer == "TIMG4":
+                return 2;
+                break;
+            case main_timer == "TIMG5":
+                return 3;
+                break;
+            case main_timer == "TIMG8":
+                return 4;
+                break;
+            case main_timer == "TIMG12":
+                return 5;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+    else if(isDeviceFamily_PARENT_MSPM0GX51X()) {
+        switch (true) {
+            case (main_timer == "TIMA0" || main_timer == "TIMG0"):
+                return 0;
+                break;
+            case (main_timer == "TIMA1" || main_timer == "TIMG8"):
+                return 1;
+                break;
+            case (main_timer == "TIMG6" || main_timer == "TIMG14"):
+                return 2;
+                break;
+            case (main_timer == "TIMG7" || main_timer == "TIMG9"):
+                return 3;
+                break;
+            case main_timer == "TIMG12":
+                return 4;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+    else if(isDeviceFamily_PARENT_MSPM0L111X()) {
+        switch (true) {
+            case main_timer == "TIMA0":
+                return 0;
+                break;
+            case main_timer == "TIMG0":
+                return 1;
+                break;
+            case main_timer == "TIMG1":
+                return 2;
+                break;
+            case main_timer == "TIMG8":
+                return 3;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+    else if(isDeviceFamily_PARENT_MSPM0C110X()) {
+        switch (true) {
+            case main_timer == "TIMA0":
+                return 0;
+                break;
+            case main_timer == "TIMG0":
+                return 1;
+                break;
+            case main_timer == "TIMG8":
+                return 2;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+    else if(isDeviceFamily_PARENT_MSPM0H321X() || isDeviceFamily_PARENT_MSPM0C1105_C1106()) {
+        switch (true) {
+            case main_timer == "TIMA0":
+                return 0;
+                break;
+            case main_timer == "TIMG0":
+                return 1;
+                break;
+            case main_timer == "TIMG8":
+                return 2;
+                break;
+            case main_timer == "TIMG2":
+                return 3;
+                break;
+            case main_timer == "TIMG1":
+                return 4;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+}
+
+
+/*
+ *  ======== hasExpandedADCVRSEL ========
+ *  Check if current device has expanded ADC VRSEL options
+ *
+ *  @return true if device support expanded ADC VRSEL options
+ *
+ */
+function hasExpandedADCVRSEL(){
+    // Features initially supported in MSPM0H family of devices.
+    // --Ideally we should be able to check this from device data if possible.
+    return (isDeviceFamily_PARENT_MSPM0H321X() || isDeviceFamily_PARENT_MSPM0GX51X());
+}
+/*
+ *  ======== hasMATHACL ========
+ *  For a given device, check if it has MATHACL support
+ *
+ *  @return true if device supports MATHACL
+ *
+ */
+function hasMATHACL(){
+    return /MATHACL/.test(peripherals);
 }

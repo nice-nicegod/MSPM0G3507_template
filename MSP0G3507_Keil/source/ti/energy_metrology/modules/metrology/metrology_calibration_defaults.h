@@ -61,6 +61,7 @@ extern calibrationData calibrationDefaults;
 /*! @brief Defines a flag data to check the availability of data in flash   */
 #define CONFIG_INIT_FLAG                                (0xABCD)
 
+#if defined(THREE_PHASE_SUPPORT) || defined(TWO_PHASE_SUPPORT) || defined(SPLIT_PHASE_SUPPORT) || defined(SINGLE_PHASE_SUPPORT)
 /*! @brief Defines the scale factor for voltage at phase A      */
 #define DEFAULT_V_RMS_SCALE_FACTOR_A                    _IQ19(PHASE_A_VOLTAGE_SCALE_FACTOR)
 /*! @brief Defines the voltage DC estimate in phase A           */
@@ -68,23 +69,7 @@ extern calibrationData calibrationDefaults;
 /*! @brief Defines the voltage AC offset in phase A             */
 #define DEFAULT_V_AC_OFFSET_A                           _IQ19(PHASE_A_VOLTAGE_AC_OFFSET)
 /*! @brief Defines the fundamental voltage AC offset in phase A */
-#define DEFAULT_V_FUNDAMENTAL_OFFSET_A                  _IQ19(PHASE_A_VOLTAGE_FUNDAMENATAL_OFFSET)
-/*! @brief Defines the scale factor for voltage at phase B      */
-#define DEFAULT_V_RMS_SCALE_FACTOR_B                    _IQ19(PHASE_B_VOLTAGE_SCALE_FACTOR)
-/*! @brief Defines the voltage DC estimate in phase B           */
-#define DEFAULT_V_DC_ESTIMATE_B                         _IQ19(PHASE_B_VOLTAGE_DC_ESTIMATE)
-/*! @brief Defines the voltage AC offset in phase B             */
-#define DEFAULT_V_AC_OFFSET_B                           _IQ19(PHASE_B_VOLTAGE_AC_OFFSET)
-/*! @brief Defines the fundamental voltage AC offset in phaseB  */
-#define DEFAULT_V_FUNDAMENTAL_OFFSET_B                  _IQ19(PHASE_B_VOLTAGE_FUNDAMENATAL_OFFSET)
-/*! @brief Defines the scale factor for voltage at phase C      */
-#define DEFAULT_V_RMS_SCALE_FACTOR_C                    _IQ19(PHASE_C_VOLTAGE_SCALE_FACTOR)
-/*! @brief Defines the voltage DC estimate in phase C           */
-#define DEFAULT_V_DC_ESTIMATE_C                         _IQ19(PHASE_C_VOLTAGE_DC_ESTIMATE)
-/*! @brief Defines the voltage AC offset in phase B             */
-#define DEFAULT_V_AC_OFFSET_C                           _IQ19(PHASE_C_VOLTAGE_AC_OFFSET)
-/*! @brief Defines the fundamental voltage AC offset in phase B */
-#define DEFAULT_V_FUNDAMENTAL_OFFSET_C                  _IQ19(PHASE_C_VOLTAGE_FUNDAMENATAL_OFFSET)
+#define DEFAULT_V_FUNDAMENTAL_OFFSET_A                  _IQ19(PHASE_A_VOLTAGE_FUNDAMENTAL_OFFSET)
 /*! @brief Defines the scale factor for current at phase A      */
 #define DEFAULT_I_RMS_SCALE_FACTOR_A                    _IQ19(PHASE_A_CURRENT_SCALE_FACTOR)
 /*! @brief Defines the scale factor for power at phase A        */
@@ -94,7 +79,26 @@ extern calibrationData calibrationDefaults;
 /*! @brief Defines the current AC offset in phase A             */
 #define DEFAULT_I_AC_OFFSET_A                           _IQ19(PHASE_A_CURRENT_AC_OFFSET)
 /*! @brief Defines the fundamental current AC offset in phase A */
-#define DEFAULT_I_FUNDAMENTAL_OFFSET_A                  _IQ19(PHASE_A_CURRENT_FUNDAMENATAL_OFFSET)
+#define DEFAULT_I_FUNDAMENTAL_OFFSET_A                  _IQ19(PHASE_A_CURRENT_FUNDAMENTAL_OFFSET)
+/*! @brief Defines active power offset in phase A               */
+#define DEFAULT_P_OFFSET_A                              _IQ13(PHASE_A_ACTIVE_POWER_OFFSET)
+/*! @brief Defines fundamental active power offset in phase A   */
+#define DEFAULT_FUNDAMENTAL_P_OFFSET_A                  _IQ13(PHASE_A_ACTIVE_POWER_FUNDAMENTAL_OFFSET)
+/*! @brief Defines reactive power offset in phase A             */
+#define DEFAULT_Q_OFFSET_A                              _IQ13(PHASE_A_REACTIVE_POWER_OFFSET)
+/*! @brief Defines fundamental reactive power offset in phase A */
+#define DEFAULT_FUNDAMENTAL_Q_OFFSET_A                  _IQ13(PHASE_A_REACTIVE_POWER_FUNDAMENTAL_OFFSET)
+#endif 
+
+#if defined(THREE_PHASE_SUPPORT) || defined(TWO_PHASE_SUPPORT) || defined(SPLIT_PHASE_SUPPORT)
+/*! @brief Defines the scale factor for voltage at phase B      */
+#define DEFAULT_V_RMS_SCALE_FACTOR_B                    _IQ19(PHASE_B_VOLTAGE_SCALE_FACTOR)
+/*! @brief Defines the voltage DC estimate in phase B           */
+#define DEFAULT_V_DC_ESTIMATE_B                         _IQ19(PHASE_B_VOLTAGE_DC_ESTIMATE)
+/*! @brief Defines the voltage AC offset in phase B             */
+#define DEFAULT_V_AC_OFFSET_B                           _IQ19(PHASE_B_VOLTAGE_AC_OFFSET)
+/*! @brief Defines the fundamental voltage AC offset in phaseB  */
+#define DEFAULT_V_FUNDAMENTAL_OFFSET_B                  _IQ19(PHASE_B_VOLTAGE_FUNDAMENTAL_OFFSET)
 /*! @brief Defines the scale factor for current at phase B      */
 #define DEFAULT_I_RMS_SCALE_FACTOR_B                    _IQ19(PHASE_B_CURRENT_SCALE_FACTOR)
 /*! @brief Defines the scale factor for power at phase B        */
@@ -104,7 +108,26 @@ extern calibrationData calibrationDefaults;
 /*! @brief Defines the current AC offset in phase B             */
 #define DEFAULT_I_AC_OFFSET_B                           _IQ19(PHASE_B_CURRENT_AC_OFFSET)
 /*! @brief Defines the fundamental current AC offset in phase B */
-#define DEFAULT_I_FUNDAMENTAL_OFFSET_B                  _IQ19(PHASE_B_CURRENT_FUNDAMENATAL_OFFSET)
+#define DEFAULT_I_FUNDAMENTAL_OFFSET_B                  _IQ19(PHASE_B_CURRENT_FUNDAMENTAL_OFFSET)
+/*! @brief Defines active power offset in phase B               */
+#define DEFAULT_P_OFFSET_B                              _IQ13(PHASE_B_ACTIVE_POWER_OFFSET)
+/*! @brief Defines fundamental active power offset in phase B   */
+#define DEFAULT_FUNDAMENTAL_P_OFFSET_B                  _IQ13(PHASE_B_ACTIVE_POWER_FUNDAMENTAL_OFFSET)
+/*! @brief Defines reactive power offset in phase B             */
+#define DEFAULT_Q_OFFSET_B                              _IQ13(PHASE_B_REACTIVE_POWER_OFFSET)
+/*! @brief Defines fundamental reactive power offset in phase B */
+#define DEFAULT_FUNDAMENTAL_Q_OFFSET_B                  _IQ13(PHASE_B_REACTIVE_POWER_FUNDAMENTAL_OFFSET)
+#endif 
+
+#if defined(THREE_PHASE_SUPPORT)
+/*! @brief Defines the scale factor for voltage at phase C      */
+#define DEFAULT_V_RMS_SCALE_FACTOR_C                    _IQ19(PHASE_C_VOLTAGE_SCALE_FACTOR)
+/*! @brief Defines the voltage DC estimate in phase C           */
+#define DEFAULT_V_DC_ESTIMATE_C                         _IQ19(PHASE_C_VOLTAGE_DC_ESTIMATE)
+/*! @brief Defines the voltage AC offset in phase B             */
+#define DEFAULT_V_AC_OFFSET_C                           _IQ19(PHASE_C_VOLTAGE_AC_OFFSET)
+/*! @brief Defines the fundamental voltage AC offset in phase B */
+#define DEFAULT_V_FUNDAMENTAL_OFFSET_C                  _IQ19(PHASE_C_VOLTAGE_FUNDAMENTAL_OFFSET)
 /*! @brief Defines the scale factor for current at phase C      */
 #define DEFAULT_I_RMS_SCALE_FACTOR_C                    _IQ19(PHASE_C_CURRENT_SCALE_FACTOR)
 /*! @brief Defines the scale factor for power at phase C        */
@@ -114,7 +137,18 @@ extern calibrationData calibrationDefaults;
 /*! @brief Defines the current AC offset in phase C             */
 #define DEFAULT_I_AC_OFFSET_C                           _IQ19(PHASE_C_CURRENT_AC_OFFSET)
 /*! @brief Defines the fundamental current AC offset in phase C */
-#define DEFAULT_I_FUNDAMENTAL_OFFSET_C                  _IQ19(PHASE_C_CURRENT_FUNDAMENATAL_OFFSET)
+#define DEFAULT_I_FUNDAMENTAL_OFFSET_C                  _IQ19(PHASE_C_CURRENT_FUNDAMENTAL_OFFSET)
+/*! @brief Defines active power offset in phase C               */
+#define DEFAULT_P_OFFSET_C                              _IQ13(PHASE_C_ACTIVE_POWER_OFFSET)
+/*! @brief Defines fundamental active power offset in phase C   */
+#define DEFAULT_FUNDAMENTAL_P_OFFSET_C                  _IQ13(PHASE_C_ACTIVE_POWER_FUNDAMENTAL_OFFSET)
+/*! @brief Defines reactive power offset in phase C             */
+#define DEFAULT_Q_OFFSET_C                              _IQ13(PHASE_C_REACTIVE_POWER_OFFSET)
+/*! @brief Defines fundamental reactive power offset in phase C */
+#define DEFAULT_FUNDAMENTAL_Q_OFFSET_C                  _IQ13(PHASE_C_REACTIVE_POWER_FUNDAMENTAL_OFFSET)
+#endif
+
+#if defined(NEUTRAL_MONITOR_SUPPORT)
 /*! @brief Defines the scale factor for current at neutral      */
 #define DEFAULT_I_RMS_SCALE_FACTOR_NEUTRAL              _IQ19(NEUTRAL_CURRENT_SCALE_FACTOR)
 /*! @brief Defines the current DC estimate in neutral           */
@@ -122,31 +156,7 @@ extern calibrationData calibrationDefaults;
 /*! @brief Defines the current AC offset in neutral             */
 #define DEFAULT_I_AC_OFFSET_NEUTRAL                     _IQ19(NEUTRAl_CURRENT_AC_OFFSET)
 /*! @brief Defines the fundamental current AC offset in neutral */
-#define DEFAULT_I_FUNDAMENTAL_OFFSET_NEUTRAL            _IQ19(NEUTRAL_CURRENT_FUNDAMENATAL_OFFSET)
-/*! @brief Defines active power offset in phase A               */
-#define DEFAULT_P_OFFSET_A                              _IQ13(PHASE_A_ACTIVE_POWER_OFFSET)
-/*! @brief Defines fundamental active power offset in phase A   */
-#define DEFAULT_FUNDAMENTAL_P_OFFSET_A                  _IQ13(PHASE_A_ACTIVE_POWER_FUNDAMENATAL_OFFSET)
-/*! @brief Defines reactive power offset in phase A             */
-#define DEFAULT_Q_OFFSET_A                              _IQ13(PHASE_A_REACTIVE_POWER_OFFSET)
-/*! @brief Defines fundamental reactive power offset in phase A */
-#define DEFAULT_FUNDAMENTAL_Q_OFFSET_A                  _IQ13(PHASE_A_REACTIVE_POWER_FUNDAMENATAL_OFFSET)
-/*! @brief Defines active power offset in phase B               */
-#define DEFAULT_P_OFFSET_B                              _IQ13(PHASE_B_ACTIVE_POWER_OFFSET)
-/*! @brief Defines fundamental active power offset in phase B   */
-#define DEFAULT_FUNDAMENTAL_P_OFFSET_B                  _IQ13(PHASE_B_ACTIVE_POWER_FUNDAMENATAL_OFFSET)
-/*! @brief Defines reactive power offset in phase B             */
-#define DEFAULT_Q_OFFSET_B                              _IQ13(PHASE_B_REACTIVE_POWER_OFFSET)
-/*! @brief Defines fundamental reactive power offset in phase B */
-#define DEFAULT_FUNDAMENTAL_Q_OFFSET_B                  _IQ13(PHASE_B_REACTIVE_POWER_FUNDAMENATAL_OFFSET)
-/*! @brief Defines active power offset in phase C               */
-#define DEFAULT_P_OFFSET_C                              _IQ13(PHASE_C_ACTIVE_POWER_OFFSET)
-/*! @brief Defines fundamental active power offset in phase C   */
-#define DEFAULT_FUNDAMENTAL_P_OFFSET_C                  _IQ13(PHASE_C_ACTIVE_POWER_FUNDAMENATAL_OFFSET)
-/*! @brief Defines reactive power offset in phase C             */
-#define DEFAULT_Q_OFFSET_C                              _IQ13(PHASE_C_REACTIVE_POWER_OFFSET)
-/*! @brief Defines fundamental reactive power offset in phase C */
-#define DEFAULT_FUNDAMENTAL_Q_OFFSET_C                  _IQ13(PHASE_C_REACTIVE_POWER_FUNDAMENATAL_OFFSET)
+#define DEFAULT_I_FUNDAMENTAL_OFFSET_NEUTRAL            _IQ19(NEUTRAL_CURRENT_FUNDAMENTAL_OFFSET)
 /*! @brief Defines the scale factor for power at neutral        */
 #define DEFAULT_P_SCALE_FACTOR_NEUTRAL                  _IQ19(NEUTRAL_POWER_SCALE_FACTOR)
 /*! @brief Defines active power offset in neutral               */
@@ -157,6 +167,7 @@ extern calibrationData calibrationDefaults;
 #define DEFAULT_FUNDAMENTAL_P_OFFSET_NEUTRAL            _IQ19(NEUTRAL_ACTIVE_POWER_FUNDAMENTAL_OFFSET)
 /*! @brief Defines fundamental reactive power offset in neutral */
 #define DEFAULT_FUNDAMENTAL_Q_OFFSET_NEUTRAL            _IQ19(NEUTRAL_REACTIVE_POWER_FUNDAMENTAL_OFFSET)
+#endif
 
 /* Value is phase angle in 1/256th of a sample increments. */
 
@@ -266,6 +277,7 @@ calibrationData calibrationDefaults =
 #endif
     },
     {
+#if defined(NEUTRAL_MONITOR_SUPPORT)
         .IinitialDcEstimate     = DEFAULT_I_DC_ESTIMATE_NEUTRAL,
         .IacOffset              = DEFAULT_I_AC_OFFSET_NEUTRAL,
         .IFAcOffset             = DEFAULT_I_FUNDAMENTAL_OFFSET_NEUTRAL,
@@ -276,6 +288,7 @@ calibrationData calibrationDefaults =
         .phaseOffset            = DEFAULT_BASE_NEUTRAL_PHASE_CORRECTION,
         .IscaleFactor           = DEFAULT_I_RMS_SCALE_FACTOR_NEUTRAL,
         .PscaleFactor           = DEFAULT_P_SCALE_FACTOR_NEUTRAL,
+#endif
     },
     .structState = 0x59,
     .calibrationInitFlag = CONFIG_INIT_FLAG

@@ -85,6 +85,8 @@
 #include "services.h"
 #include "servicesHAL.h"
 
+#define MAX(A, B)  A>B?A:B
+
 #define PER_MIL_TO_PER_UNIT     0.001
 #define PER_10K_TO_PER_UNIT     0.0001
 
@@ -134,8 +136,6 @@ void updateMotorConfigParam(SENSORED_FOC_APPLICATION_T *);
 void updateMotorInputOutputConfigParam(SENSORED_FOC_APPLICATION_T *);
 void updateSourceCurrentLimitConfigParam(SENSORED_FOC_APPLICATION_T *);
 void updateSourceVoltageLimitConfigParam(SENSORED_FOC_APPLICATION_T *);
-void updateCloseLoopConfigParam(SENSORED_FOC_APPLICATION_T *);
-void updateCurrentControlConfigParam(SENSORED_FOC_APPLICATION_T *);
 void updateOpenLoopConfigParam(SENSORED_FOC_APPLICATION_T *);
 void updateHallCalibConfigParam(SENSORED_FOC_APPLICATION_T *);
 void updateFOCStallDetectConfigParam(SENSORED_FOC_APPLICATION_T *);
@@ -252,38 +252,60 @@ void updateMotorInputOutputConfigParam(SENSORED_FOC_APPLICATION_T
 
     int32_t blankingTime=0,ADCCyc;
 
-    blankingTime = (pUserInputRegs->periphCfg1.b.mcuDeadTime<<2);
 
-    blankingTime += (propagationDelay_nS + minOnTime_ns)* ((int32_t)CPU_FREQUENCY_MHZ)/1000;
 
-    ADCCyc = (ADC_SAMPLING_TIME_ns )* ((int32_t)CPU_FREQUENCY_MHZ);
+    if(HAL_Is_SingleShunt())
+    {
+        blankingTime = (pUserInputRegs->periphCfg1.b.mcuDeadTime<<2);
 
-    minPWMCountPerMil = ADCCyc + (blankingTime *1000);
+        blankingTime += (propagationDelay_nS + minOnTime_ns)* ((int32_t)CPU_FREQUENCY_MHZ)/1000;
 
-    pMC_App->foc.svm.blankingTime = blankingTime;
-    pMC_App->foc.svm.minPWMdelta = blankingTime + (ADCCyc/1000);
-    minDutyPerMil = minPWMCountPerMil/(pMC_App->motorInputs.pwmPeriod);
+        ADCCyc = (ADC_SAMPLING_TIME_ns )* ((int32_t)CPU_FREQUENCY_MHZ);
 
-if((pUserInputRegs->closeLoop1.b.pwmMode) &&
-        (pFOC->closeLoop.commutationState == COMMUTATION_ALIGNED))
-{
-    pMC_App->foc.svm.svmGen = SVM_DISCONTINUOUS;
+        pMC_App->foc.svm.blankingTime = blankingTime;
 
-    minDutyPerMilDisCont = ((DISCONTINUOUS_MIN_DUTY_COUNTS * 1000)/
-            pMC_App->motorInputs.pwmPeriod);
+        minPWMCountPerMil = ADCCyc + (blankingTime *1000);
 
-}
-else
-{
-    pMC_App->foc.svm.svmGen = SVM_CONTINUOUS;
-}
+        pMC_App->foc.svm.minPWMdelta = blankingTime + (ADCCyc/1000);
 
-pMC_App->motorInputs.propagationDelay =
-        (((int32_t)CPU_FREQUENCY_MHZ) * propagationDelay_nS * 2)/1000;
+        minDutyPerMil = minPWMCountPerMil/(pMC_App->motorInputs.pwmPeriod);
+    }
+    else
+    {
+        blankingTime = (minOnTime_ns)* ((int32_t)CPU_FREQUENCY_MHZ);
 
-userInputsPerMilToAlgoVar(minDutyPerMil, &pMC_App->foc.svm.minDuty);
-userInputsPerMilToAlgoVar(minDutyPerMilDisCont,
-                          &pMC_App->foc.svm.minDutyDisCont);
+        ADCCyc = (ADC_SAMPLING_TIME_ns )* ((int32_t)CPU_FREQUENCY_MHZ);
+
+        pMC_App->foc.svm.blankingTime = 0;
+
+        minPWMCountPerMil = MAX(ADCCyc , blankingTime);
+
+        pMC_App->foc.svm.minPWMdelta = 0;
+
+        minDutyPerMil = minPWMCountPerMil/(pMC_App->motorInputs.pwmPeriod);
+    }
+
+
+    if((pUserInputRegs->closeLoop1.b.pwmMode) &&
+            (pFOC->closeLoop.commutationState == COMMUTATION_ALIGNED))
+    {
+        pMC_App->foc.svm.svmGen = SVM_DISCONTINUOUS;
+
+        minDutyPerMilDisCont = ((DISCONTINUOUS_MIN_DUTY_COUNTS * 1000)/
+                pMC_App->motorInputs.pwmPeriod);
+
+    }
+    else
+    {
+        pMC_App->foc.svm.svmGen = SVM_CONTINUOUS;
+    }
+
+    pMC_App->motorInputs.propagationDelay =
+            (((int32_t)CPU_FREQUENCY_MHZ) * propagationDelay_nS * 2)/1000;
+
+    userInputsPerMilToAlgoVar(minDutyPerMil, &pMC_App->foc.svm.minDuty);
+    userInputsPerMilToAlgoVar(minDutyPerMilDisCont,
+                              &pMC_App->foc.svm.minDutyDisCont);
 
 }
 

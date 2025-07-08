@@ -131,6 +131,8 @@ extern const uint16_t tbl_thetaErrRampRate_mili[8];
 /*! @brief Table for slow first cycle frequency */
 extern const uint16_t tbl_olFirstCycFreqPerMil[16];
 
+/*! @brief Table for PWM Frequency Selection */
+extern const uint16_t tbl1_clPWMFreqKHz[16];
 /* Fault Config 1 and Config2 */
 /*! @brief Table for abnormal speed lock */
 extern const uint16_t tbl_lckAbnormalSpeed_pMil[8];

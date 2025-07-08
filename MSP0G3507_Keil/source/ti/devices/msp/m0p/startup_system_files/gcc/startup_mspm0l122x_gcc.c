@@ -42,6 +42,11 @@ extern int  main( void );
 extern uint32_t __data_load__;
 extern uint32_t __data_start__;
 extern uint32_t __data_end__;
+extern uint32_t __ramfunct_load__;
+extern uint32_t __ramfunct_start__;
+extern uint32_t __ramfunct_end__;
+extern uint32_t __bss_start__;
+extern uint32_t __bss_end__;
 extern uint32_t __StackTop;
 
 typedef void( *pFunc )( void );
@@ -68,13 +73,11 @@ extern void UART4_IRQHandler    (void) __attribute__((weak, alias("Default_Handl
 extern void ADC0_IRQHandler     (void) __attribute__((weak, alias("Default_Handler")));
 extern void SPI0_IRQHandler     (void) __attribute__((weak, alias("Default_Handler")));
 extern void SPI1_IRQHandler     (void) __attribute__((weak, alias("Default_Handler")));
-extern void SPI2_IRQHandler     (void) __attribute__((weak, alias("Default_Handler")));
 extern void UART2_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
 extern void UART3_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
 extern void UART0_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
 extern void UART1_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
 extern void TIMA0_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
-extern void TIMA1_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
 extern void TIMG8_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
 extern void TIMG0_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
 extern void TIMG4_IRQHandler    (void) __attribute__((weak, alias("Default_Handler")));
@@ -119,7 +122,7 @@ void (* const interruptVectors[])(void) __attribute__ ((used)) __attribute__ ((s
     0,                                     /* Reserved                  */
     SPI0_IRQHandler,                       /* SPI0 interrupt handler    */
     SPI1_IRQHandler,                       /* SPI1 interrupt handler    */
-    SPI2_IRQHandler,                       /* SPI1 interrupt handler    */
+    0,                                     /* Reserved                  */
     0,                                     /* Reserved                  */
     UART2_IRQHandler,                      /* UART2 interrupt handler   */
     UART3_IRQHandler,                      /* UART3 interrupt handler   */
@@ -127,7 +130,7 @@ void (* const interruptVectors[])(void) __attribute__ ((used)) __attribute__ ((s
     UART1_IRQHandler,                      /* UART1 interrupt handler   */
     0,                                     /* Reserved                  */
     TIMA0_IRQHandler,                      /* TIMA0 interrupt handler   */
-    TIMA1_IRQHandler,                      /* TIMA1 interrupt handler   */
+    0,                                     /* Reserved                  */
     TIMG8_IRQHandler,                      /* TIMG8 interrupt handler   */
     TIMG0_IRQHandler,                      /* TIMG0 interrupt handler   */
     TIMG4_IRQHandler,                      /* TIMG4 interrupt handler   */
@@ -152,6 +155,7 @@ void (* const interruptVectors[])(void) __attribute__ ((used)) __attribute__ ((s
 void Reset_Handler(void)
 {
     uint32_t *pui32Src, *pui32Dest;
+    uint32_t *bs, *be;
 
     //
     // Copy the data segment initializers from flash to SRAM.
@@ -160,6 +164,24 @@ void Reset_Handler(void)
     for(pui32Dest = &__data_start__; pui32Dest < &__data_end__; )
     {
         *pui32Dest++ = *pui32Src++;
+    }
+
+    //
+    // Copy the ramfunct segment initializers from flash to SRAM.
+    //
+    pui32Src = &__ramfunct_load__;
+    for(pui32Dest = &__ramfunct_start__; pui32Dest < &__ramfunct_end__; )
+    {
+        *pui32Dest++ = *pui32Src++;
+    }
+
+    // Initialize .bss to zero
+    bs = &__bss_start__;
+    be = &__bss_end__;
+    while (bs < be)
+    {
+        *bs = 0;
+        bs++;
     }
 
     /*
@@ -176,6 +198,11 @@ void Reset_Handler(void)
 
     /* Jump to the main initialization routine. */
     main();
+
+    //
+    // If we ever return signal Error
+    //
+    HardFault_Handler();
 }
 
 /* This is the code that gets called when the processor receives an unexpected  */

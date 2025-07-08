@@ -89,5 +89,7 @@ void motorInputOutputConfig(SENSORED_FOC_APPLICATION_T *pMC_App)
     pMC_App->pVoltageSector = &(pMC_App->foc.svm.voltageSector);
     pMC_App->pBlankingTime = &(pMC_App->foc.svm.blankingTime);
     pMC_App->pMinPWMdelta = &(pMC_App->foc.svm.minPWMdelta);
+
+    g_pMotorInputs->current.pSourceCurrentFilt = &(pMC_App->sourceLimits.sourceCurrentEstim.sourceCurrentFilt);
 }
 

@@ -154,9 +154,6 @@ static void I2CMSPM0_readReceiveFifo(
             }
         }
     }
-    DL_I2C_clearInterruptStatus(
-        hwAttrs->i2c, (DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_FULL |
-                          DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_TRIGGER));
 }
 
 /*!
@@ -434,19 +431,19 @@ static void I2CMSPM0_hwiFxn(uintptr_t arg)
         }
     } else if (intStatus & (DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_FULL |
                                DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_TRIGGER)) {
+        DL_I2C_clearInterruptStatus(
+            hwAttrs->i2c, (DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_FULL |
+                              DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_TRIGGER));
         I2CMSPM0_readReceiveFifo(object, hwAttrs);
 
         /* If we need to configure a new burst */
         if (object->readCount && (object->burstCount == 0)) {
             I2CMSPM0_primeReadBurst(object, hwAttrs);
-        } else {
-            DL_I2C_clearInterruptStatus(
-                hwAttrs->i2c, (DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_FULL |
-                                  DL_I2C_INTERRUPT_CONTROLLER_RXFIFO_TRIGGER));
         }
     } else if (intStatus & DL_I2C_INTERRUPT_CONTROLLER_RX_DONE) {
         DL_I2C_clearInterruptStatus(
             hwAttrs->i2c, DL_I2C_INTERRUPT_CONTROLLER_RX_DONE);
+        if (object->readCount != 0) I2CMSPM0_readReceiveFifo(object, hwAttrs);
         /*Update the current transaction readCount*/
         object->currentTransaction->readCount = object->readCount;
         object->isReadInProgress              = false;
@@ -461,7 +458,8 @@ static void I2CMSPM0_hwiFxn(uintptr_t arg)
             I2CMSPM0_primeReadBurst(object, hwAttrs);
         }
     }
-    /* If the STOP condition was set, complete the transfer */
+    /* If the STOP condition was set, complete the transfer.
+    *  When all other interrupts are handled then serve for the Stop */
     if (intStatus & DL_I2C_INTERRUPT_CONTROLLER_STOP) {
         /* If the transaction completed, update the transaction status */
         if (object->currentTransaction->status == I2C_STATUS_INCOMPLETE &&
@@ -824,7 +822,7 @@ static void I2CMSPM0_completeTransfer(I2C_Handle handle, uint32_t intStatus)
         object->transferCallbackFxn(handle, object->currentTransaction, false);
         object->currentTransaction->status = I2C_STATUS_CANCEL;
 
-        /*Power_releaseConstraint(PowerCC32XX_DISALLOW_LPDS);*/
+        /*Power_releaseConstraint(Power_DISALLOW_LPDS);*/
 
         /* also dequeue and call the transfer callbacks for any queued transfers */
         while (object->headPtr != object->tailPtr) {
@@ -854,7 +852,7 @@ static void I2CMSPM0_completeTransfer(I2C_Handle handle, uint32_t intStatus)
             (object->currentTransaction->status == I2C_STATUS_SUCCESS));
 
         /* Release constraint since transaction is done */
-        /* Power_releaseConstraint(PowerCC32XX_DISALLOW_LPDS);*/
+        /* Power_releaseConstraint(Power_DISALLOW_LPDS);*/
     } else {
         /* Another transfer needs to take place */
         object->headPtr = object->headPtr->nextPtr;

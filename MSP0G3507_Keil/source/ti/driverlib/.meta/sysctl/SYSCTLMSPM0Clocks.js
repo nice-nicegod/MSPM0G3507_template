@@ -115,7 +115,8 @@ By default, this configuration enables the internal resistor FCL mode for suppor
                     inst.LFCLK_Freq_IN = 32768;
                 }
 
-                if(Common.isDeviceM0G() || Common.isDeviceFamily_PARENT_MSPM0L122X_L222X()){
+                if(Common.isDeviceM0G() || Common.isDeviceFamily_PARENT_MSPM0L122X_L222X() ||
+                   Common.isDeviceFamily_PARENT_MSPM0L111X() || Common.isDeviceFamily_PARENT_MSPM0H321X() || Common.isDeviceFamily_PARENT_MSPM0C1105_C1106()){
                     if(inst.LFCLKSource == "LFXT"){
                         inst.validateClkStatus = true;
                         ui.validateClkStatus.readOnly = true;
@@ -207,11 +208,11 @@ such as DAC.
         },
         {
             name        : "HFXTStartup",
-            displayName : "HFXT Startup Time",
+            displayName : "HFXT Startup Time (increments of 64us)",
             description : 'Specify the HFXT startup time in 64us resolution.',
             hidden      : false,
             range       : [0,255],
-            default     : 0
+            default     : 10
         },
         {
             name        : "HFXTStartupCalculated",
@@ -396,10 +397,18 @@ such as DAC.
         // DL_SYSCTL_setHFCLKSourceHFXTParams -> range
         {
             name: "HFCLK_Freq",
-            displayName: "External HF Clock Frequency (Hz)",
+            displayName: "Set External HF Clock Frequency (Hz)",
             default: 4000000,
             isInteger: true,
             range: [4000000,48000000]
+        },
+        {
+            name: "HFCLK_FreqDisplay",
+            displayName: "External HF Clock Frequency",
+            default: "undefined",
+            getValue: (inst)=>{
+                return Common.getUnitPrefix(inst.HFCLK_Freq).str+"Hz";
+            }
         },
     ],
 
@@ -454,7 +463,7 @@ such as DAC.
             default     : false,
             getValue    : (inst) => {
                 /* SYSPLL is not available foor M0Lx device family */
-                if(Common.isDeviceM0L() || Common.isDeviceM0C() || inst.clockTreeEn){
+                if(Common.isDeviceM0L() || Common.isDeviceM0C() || Common.isDeviceM0H() || inst.clockTreeEn){
                     return false;
                 }
                 if((inst.MCLKSource === "HSCLK")&&
@@ -481,7 +490,7 @@ such as DAC.
             default     : "",
             getValue    : (inst) => {
                 /* SYSPLL is not available foor M0Lx device family */
-                if(Common.isDeviceM0L() || Common.isDeviceM0C() || inst.clockTreeEn){
+                if(Common.isDeviceM0L() || Common.isDeviceM0C() || Common.isDeviceM0H() || inst.clockTreeEn){
                     return "";
                 }
                 let inUse = "";
@@ -1105,10 +1114,10 @@ const clkFreqSuperset = {
     "HFCLK": [
         { name: "HFCLK_FreqOut", displayName: "HFCLK", default: 0, hidden: true, readOnly: true,
             getValue: (inst) => {
-                if(inst.clockTreeEn && (Common.isDeviceM0G() || Common.isDeviceFamily_PARENT_MSPM0L122X_L222X())){
+                if(inst.clockTreeEn && (Common.isDeviceM0G() || Common.isDeviceFamily_PARENT_MSPM0L122X_L222X() || Common.isDeviceFamily_PARENT_MSPM0H321X())){
                     return system.clockTree["net_hfclk"].in * 1000000;
                 }
-                if(inst.clockTreeEn && Common.isDeviceM0C()){
+                if(inst.clockTreeEn && Common.isDeviceFamily_PARENT_MSPM0C110X()){
                     return system.clockTree["net_hfclkext"].in * 1000000;
                 }
                 return inst.useHFCLK_Manual?inst.HFCLK_Freq:0;
@@ -1125,7 +1134,7 @@ const clkFreqSuperset = {
                 if(Common.isDeviceM0G()){
                     return inst.MCLK_Freq / parseInt(inst.UDIV);
                 }
-                else if(Common.isDeviceM0L() || Common.isDeviceM0C()){
+                else if(Common.isDeviceM0L() || Common.isDeviceM0C() || Common.isDeviceM0H()){
                     return inst.MCLK_Freq;
                 }
                 else return 0;
@@ -1207,6 +1216,30 @@ const ClockSignals = {
         "ROSC",
         ... commonClockSignals,
     ],
+    "MSPM0L111X": [
+        "MFPCLK",
+        "LFXT",
+        "ROSC",
+        "HFCLK",
+        "HSCLK",
+        ... commonClockSignals,
+    ],
+    "MSPM0H321X": [
+        "MFPCLK",
+        "HFCLK",
+        "HFXT",
+        "HSCLK",
+        "LFXT",
+        ... commonClockSignals,
+    ],
+    "MSPM0C1105_C1106": [
+        "MFPCLK",
+        "HFCLK",
+        "HFXT",
+        "HSCLK",
+        "LFXT",
+        ... commonClockSignals,
+    ]
 };
 
 

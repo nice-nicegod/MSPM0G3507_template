@@ -1166,18 +1166,27 @@ static void __attribute__((section(".TI.ramfunc"))) DLT645_processRxMessage(metr
 #if defined(THREE_PHASE_SUPPORT) || defined(TWO_PHASE_SUPPORT) || defined(SPLIT_PHASE_SUPPORT) || defined(SINGLE_PHASE_SUPPORT)
     case HOST_CMD_SET_CALIBRATION_PHASE_1:
         DLT645_setPhaseCalibrationData(workingData, dlt645, rxMsg, PHASE_ONE);
+        #if defined(REACTIVE_OFFSET_CALIBRATION)
+        calibratedReactiveOffset[PHASE_ONE] = calInfo->phases[PHASE_ONE].current.reactivePowerOffset;
+        #endif
         break;
 #endif
 
 #if defined(THREE_PHASE_SUPPORT) || defined(TWO_PHASE_SUPPORT) || defined(SPLIT_PHASE_SUPPORT)
     case HOST_CMD_SET_CALIBRATION_PHASE_2:
         DLT645_setPhaseCalibrationData(workingData, dlt645, rxMsg, PHASE_TWO);
+        #if defined(REACTIVE_OFFSET_CALIBRATION)
+        calibratedReactiveOffset[PHASE_TWO] = calInfo->phases[PHASE_TWO].current.reactivePowerOffset;
+        #endif
         break;
 #endif
 
 #if defined(THREE_PHASE_SUPPORT)
     case HOST_CMD_SET_CALIBRATION_PHASE_3:
         DLT645_setPhaseCalibrationData(workingData, dlt645, rxMsg, PHASE_THERE);
+        #if defined(REACTIVE_OFFSET_CALIBRATION)
+        calibratedReactiveOffset[PHASE_THERE] = calInfo->phases[PHASE_THERE].current.reactivePowerOffset;
+        #endif
         break;
 #endif
     case HOST_CMD_SET_CALIBRATION_NEUTRAL:

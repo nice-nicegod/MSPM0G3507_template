@@ -197,7 +197,6 @@ typedef enum IRQn
 #include <ti/devices/msp/peripherals/hw_iomux.h>
 #include <ti/devices/msp/peripherals/hw_keystorectl.h>
 #include <ti/devices/msp/peripherals/hw_lcd.h>
-#include <ti/devices/msp/peripherals/hw_lfss.h>
 #include <ti/devices/msp/peripherals/hw_rtc.h>
 #include <ti/devices/msp/peripherals/hw_spi.h>
 #include <ti/devices/msp/peripherals/hw_trng.h>
@@ -232,6 +231,7 @@ typedef enum IRQn
 #define __MSPM0_HAS_SCRATCHPAD__
 #define __MSPM0_HAS_TIO__
 #define __MSPM0_HAS_ECC__
+#define __MSPM0_HAS_LEGACY_ADC_REFERENCE__ 
 
 
 /*@}*/ /* end of group MSPM0L222X_Peripherals */
@@ -317,6 +317,8 @@ static GPIO_Regs                                * const GPIOC                   
 static FLASHCTL_Regs                            * const FLASHCTL                       = ((FLASHCTL_Regs *) FLASHCTL_BASE);
 static AESADV_Regs                              * const AESADV                         = ((AESADV_Regs *) AESADV_BASE);
 static CRCP_Regs                                * const CRCP0                          = ((CRCP_Regs *) CRCP0_BASE);
+static CRCP_Regs                                * const CRC0                           = ((CRCP_Regs *) CRCP0_BASE);
+static CRCP_Regs                                * const CRC                            = ((CRCP_Regs *) CRCP0_BASE);
 static GPTIMER_Regs                             * const TIMG0                          = ((GPTIMER_Regs *) TIMG0_BASE);
 static GPTIMER_Regs                             * const TIMG4                          = ((GPTIMER_Regs *) TIMG4_BASE);
 static GPTIMER_Regs                             * const TIMG8                          = ((GPTIMER_Regs *) TIMG8_BASE);

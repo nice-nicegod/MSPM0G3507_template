@@ -107,6 +107,9 @@ const uint16_t tbl_thetaErrRampRate_mili[8]  = {10,50,100,150,200,500,1000,2000}
 /*! @brief Table for slow first cycle frequency */
 const uint16_t tbl_olFirstCycFreqPerMil[16]  = {10,20,30,50,75,100,125,150,175,200,250,300,350,400,450,500};
 
+/*Closed Loop PWM Frequency Table */
+const uint16_t tbl1_clPWMFreqKHz[16] = {5,10,16,20,25,32,40,48,50,64,80,80,80,80,80,80};
+
 /* Fault Config 1 and Config2 */
 /*! @brief Table for abnormal speed lock */
 const uint16_t tbl_lckAbnormalSpeed_pMil[8] = {1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000};

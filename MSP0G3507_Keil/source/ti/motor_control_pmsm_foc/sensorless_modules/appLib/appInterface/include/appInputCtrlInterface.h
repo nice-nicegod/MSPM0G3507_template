@@ -178,8 +178,8 @@ typedef struct
     ipdRepeat:              2,
     /*! IPD advance angle */
     ipdAdvAngle:            2,
-    /*! IPD release mode */
-    ipdRlsMode:             1,
+    /*! Reserved */
+    reserved:               1,
     /*! IPD current threshold */
     ipdCurrThresh:          7,
     /*! IPD clock frequency */
@@ -415,8 +415,10 @@ typedef struct
     ipdHiResolEn:       1,
     /*! Close loop acceleration when estimator is not yet fully aligned */
     clSlowAcc:          4,
+    /*! Maximum number of timer overflows allowed while IPD */
+    ipdMaxOverflow:     2,
     /*! Reserved */
-    reserved:           12;
+    reserved:           10;
 }userInputMiscAlgo;
 
 /*! @brief FAULT_CONFIG2 register */
@@ -616,8 +618,10 @@ typedef struct
     statusUpdateEn:        1,
     /*! Update configurations Flag */
     updateConfigs:         1,
-    /*! Reserved */
-    reserved1:             3;
+    /*! Update System Parameters Dynamically Flag */
+    updateSysParams:       1,
+    /*! Reserved 2*/
+    Reserved2:             2;
 }ramAlgoDebugCtrl2;
 
 /*! @brief ALGO_DEBUG_2 register */

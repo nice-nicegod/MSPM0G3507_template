@@ -94,6 +94,9 @@ const uint16_t tbl1_olAccA1A2_centiHzPerSec[8] = {1, 5, 100, 250, 500, 1000, 250
 /*! @brief Table 2 for open loop acceleration */
 const uint16_t tbl2_olAccA1A2_HzPerSec[8] = {75, 100, 250, 500, 750, 1000, 5000, 10000};
 
+/*Closed Loop PWM Frequency Table */
+const uint16_t tbl1_clPWMFreqKHz[16] = {5,10,16,20,25,32,40,48,50,64,80,80,80,80,80,80};
+
 /* Close Loop Speed and Acceleration Slew Rates */
 /*! @brief Table 1 for close loop acceleration and deceleration */
 const uint16_t tbl1_clDecClAcc_deciHzPerSec[16] = {5,10,25,50,75,100,200,400,600,800,1000,2000,3000,4000,5000,6000};
@@ -170,3 +173,6 @@ const _iq tbl_maxVm_pMil[8] = {_IQ(0.60),_IQ(0.65),_IQ(0.70),_IQ(0.75),_IQ(0.80)
 /*! @brief Table for Modulation Limit Beyond which Flux weakening is enabled */
 const _iq tbl_mSqrRef[4] = {_IQ(0.49), _IQ(0.64),_IQ(0.81), _IQ(0.902)};
 
+/* Misc algo 1 Params*/
+/*! @brief Table for IPD maximum overflow */
+const uint8_t tbl_ipdMaxOverflow[4] = {5, 10, 20, 40};

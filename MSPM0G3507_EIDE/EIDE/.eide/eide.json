@@ -190,7 +190,6 @@
           "../template/hardware",
           "../template/middle",
           "../template/app",
-          ".cmsis/include",
           "../template/keil/RTE/_empty_LP_MSPM0G3507_nortos_keil"
         ],
         "libList": [],
@@ -203,8 +202,8 @@
           "version": 3,
           "beforeBuildTasks": [
             {
-              "name": "Linking syscfg",
-              "command": "cd \"${projectRoot}\" && cmd.exe /C \"${projectRoot}\\syscfg.bat '${projectRoot}\\ empty.syscfg\"",
+              "name": "linking syscfg",
+              "command": "\"S:\\Source_files\\Keil5\\MSPM0G3507\\MSPM0G3507_template\\MSPM0G3507_EIDE\\EIDE\\syscfg.bat\" \"${projectRoot}\" empty.syscfg",
               "disable": false,
               "abortAfterFailed": true,
               "stopBuildAfterFailed": true
@@ -228,12 +227,13 @@
             "$use": "asm-auto"
           },
           "linker": {
-            "output-format": "elf",
-            "misc-controls": "../source/ti/driverlib/lib/keil/m0p/mspm0g1x0x_g3x0x/driverlib.a",
-            "xo-base": "",
-            "ro-base": "",
-            "rw-base": ""
-          }
+          "output-format": "elf",
+  "misc-controls": "S:/Source_files/Keil5/MSPM0G3507/MSPM0G3507_template/MSPM0G3507_EIDE/source/ti/driverlib/lib/keil/m0p/mspm0g1x0x_g3x0x/driverlib.a",
+  "xo-base": "",
+  "ro-base": "",
+  "rw-base": ""
+}
+
         }
       }
     }

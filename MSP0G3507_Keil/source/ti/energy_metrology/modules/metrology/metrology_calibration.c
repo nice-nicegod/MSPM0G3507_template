@@ -41,6 +41,7 @@
 /*! @brief Defines nvParams struct */
 __attribute__((section(".memsector01"))) struct infoMem nvParams;
 
+/*! @brief memory sector start address */
 HAL_MEMORY_BLOCK_STARTADDR startAddr = HAL_MEMORY_BLOCK_STARTADDR01;
 
 /*! @brief Defines updated calibration data*/

@@ -112,54 +112,34 @@ void appUserInputsInterfaceConfig(SENSORED_FOC_APPLICATION_T *pMC_App)
     if((pMC_App->state == APP_INIT) || (pMC_App->state == APP_IDLE) ||
             (pMC_App->state == APP_FAULT))
     {
-            if(pUserInputRegs->closeLoop1.b.pwmFreqOut <= 13)
-            {
-                pwmFrequencyKHz = 10 +
-                        (pUserInputRegs->closeLoop1.b.pwmFreqOut * 5);
-            }
-            else
-            {
-                pwmFrequencyKHz = 75;
-            }
+        pwmFrequencyKHz = ((int32_t)tbl1_clPWMFreqKHz[pUserInputRegs->closeLoop1.b.pwmFreqOut]);
 
         /* PWM and System period counts */
         pMC_App->motorInputs.pwmPeriod = (int32_t)(CPU_FREQUENCY_MHZ * 1000UL /
                                                 pwmFrequencyKHz);
 
         /* ADC Sampling Frequency in kHz */
-        if(pwmFrequencyKHz <= 10)
+        if(pwmFrequencyKHz <= 16)
         {
             pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_PWM;
         }
-        else if(pwmFrequencyKHz <= 20)
+        else if(pwmFrequencyKHz <= 32)
         {
             pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_2_PWM;
         }
-        else if(pwmFrequencyKHz <= 30)
+        else if(pwmFrequencyKHz <= 48)
         {
             pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_3_PWM;
 
         }
-        else if(pwmFrequencyKHz <= 40)
+        else if(pwmFrequencyKHz <= 64)
         {
             pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_4_PWM;
 
         }
-        else if(pwmFrequencyKHz <= 50)
-        {
-            pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_5_PWM;
-        }
-        else if(pwmFrequencyKHz <= 60)
-        {
-            pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_6_PWM;
-        }
-        else if(pwmFrequencyKHz <= 70)
-        {
-            pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_7_PWM;
-        }
         else
         {
-            pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_8_PWM;
+            pMC_App->motorInputs.adcSamplingRatio = ADC_SAMPLE_EVERY_5_PWM;
         }
 
         if(pUserInputRegs->closeLoop1.b.highFreqFOCEn)
